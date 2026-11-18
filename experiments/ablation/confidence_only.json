@@ -1,0 +1,19 @@
+{
+  "mode": "confidence_only",
+  "split": "val",
+  "protocol": "online_prequential",
+  "seed": 42,
+  "batch_size": 64,
+  "learning_rate": 0.0001,
+  "shift": {
+    "brightness": 0.75,
+    "contrast": 1.35,
+    "saturation": 0.7
+  },
+  "threshold": 0.7,
+  "lambda_align": 0.0,
+  "accuracy": 0.797780887644942,
+  "macro_f1": 0.7997228417977015,
+  "selection_rate": 0.7357057177129148,
+  "updated_batches": 157
+}

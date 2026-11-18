@@ -1,0 +1,18 @@
+{
+  "split": "val",
+  "shift": {
+    "brightness": 0.75,
+    "contrast": 1.35,
+    "saturation": 0.7
+  },
+  "source_bn": {
+    "prototype_accuracy": 0.13484606157536985,
+    "mean_true_class_cosine": 0.3877936959600315,
+    "mean_nearest_cosine": 0.725894711009029
+  },
+  "target_batch_bn": {
+    "prototype_accuracy": 0.8125749700119952,
+    "mean_true_class_cosine": 0.7827254947020216,
+    "mean_nearest_cosine": 0.8063056595751592
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "split": "test",
+  "batch_size": 64,
+  "shift": {
+    "brightness": 0.75,
+    "contrast": 1.35,
+    "saturation": 0.7
+  },
+  "accuracy": 0.7392757660167131,
+  "macro_f1": 0.6810502424409396
+}

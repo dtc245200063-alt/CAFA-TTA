@@ -1,0 +1,58 @@
+{
+  "protocol": "shuffled_online_prequential",
+  "split": "val",
+  "shift": {
+    "brightness": 0.75,
+    "contrast": 1.35,
+    "saturation": 0.7
+  },
+  "batch_size": 64,
+  "seeds": [
+    42,
+    123,
+    2026
+  ],
+  "results": [
+    {
+      "method": "tent",
+      "seed": 42,
+      "accuracy": 0.8014794082367053,
+      "macro_f1": 0.8032608455239063
+    },
+    {
+      "method": "cafa_v2",
+      "seed": 42,
+      "accuracy": 0.801079568172731,
+      "macro_f1": 0.8027894069132921
+    },
+    {
+      "method": "tent",
+      "seed": 123,
+      "accuracy": 0.8021791283486606,
+      "macro_f1": 0.8036940347211043
+    },
+    {
+      "method": "cafa_v2",
+      "seed": 123,
+      "accuracy": 0.8011795281887245,
+      "macro_f1": 0.8027080764449531
+    },
+    {
+      "method": "tent",
+      "seed": 2026,
+      "accuracy": 0.8024790083966413,
+      "macro_f1": 0.8040461617643871
+    },
+    {
+      "method": "cafa_v2",
+      "seed": 2026,
+      "accuracy": 0.8031787285085965,
+      "macro_f1": 0.8047819040555133
+    }
+  ],
+  "paired_accuracy_differences": [
+    -0.0003998400639743105,
+    -0.0009996001599360538,
+    0.0006997201119551821
+  ]
+}

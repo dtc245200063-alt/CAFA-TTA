@@ -1,0 +1,36 @@
+{
+  "split": "val",
+  "shift": {
+    "brightness": 0.75,
+    "contrast": 1.35,
+    "saturation": 0.7
+  },
+  "total_samples": 10004,
+  "overall_accuracy": 0.7942822575569153,
+  "thresholds": {
+    "0.3": {
+      "selected": 9943,
+      "coverage": 0.9939024390243902,
+      "selected_accuracy": 0.7974454164505005,
+      "rejected_accuracy": 0.2786885201931
+    },
+    "0.5": {
+      "selected": 9299,
+      "coverage": 0.9295281887245102,
+      "selected_accuracy": 0.8240671157836914,
+      "rejected_accuracy": 0.40141844749450684
+    },
+    "0.7": {
+      "selected": 7193,
+      "coverage": 0.7190123950419832,
+      "selected_accuracy": 0.9040734171867371,
+      "rejected_accuracy": 0.5133404731750488
+    },
+    "0.9": {
+      "selected": 4854,
+      "coverage": 0.48520591763294685,
+      "selected_accuracy": 0.9674495458602905,
+      "rejected_accuracy": 0.6310679316520691
+    }
+  }
+}

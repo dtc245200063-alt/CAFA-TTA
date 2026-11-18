@@ -1,0 +1,27 @@
+{
+  "split": "val",
+  "shift": {
+    "brightness": 0.75,
+    "contrast": 1.35,
+    "saturation": 0.7
+  },
+  "batch_size": 64,
+  "confidence_threshold": 0.7,
+  "classifier_accuracy": 0.7942822575569153,
+  "prototype_accuracy": 0.8125749826431274,
+  "confidence_only": {
+    "selected": 7193,
+    "coverage": 0.7190123950419832,
+    "pseudo_label_accuracy": 0.9040734171867371
+  },
+  "agreement_only": {
+    "selected": 8916,
+    "coverage": 0.8912435025989605,
+    "pseudo_label_accuracy": 0.8527366518974304
+  },
+  "agreement_and_confidence": {
+    "selected": 6996,
+    "coverage": 0.6993202718912435,
+    "pseudo_label_accuracy": 0.9205260276794434
+  }
+}

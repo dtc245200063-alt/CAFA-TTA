@@ -1,0 +1,19 @@
+{
+  "mode": "entropy_only",
+  "split": "val",
+  "protocol": "online_prequential",
+  "seed": 42,
+  "batch_size": 64,
+  "learning_rate": 0.0001,
+  "shift": {
+    "brightness": 0.75,
+    "contrast": 1.35,
+    "saturation": 0.7
+  },
+  "threshold": 0.0,
+  "lambda_align": 0.0,
+  "accuracy": 0.7985805677728909,
+  "macro_f1": 0.8005128327688443,
+  "selection_rate": 1.0,
+  "updated_batches": 157
+}

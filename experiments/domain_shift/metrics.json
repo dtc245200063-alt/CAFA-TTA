@@ -1,0 +1,17 @@
+{
+  "split": "val",
+  "shift": {
+    "brightness": 0.75,
+    "contrast": 1.35,
+    "saturation": 0.7
+  },
+  "original": {
+    "accuracy": 0.8472610955617753,
+    "macro_f1": 0.8432168737701142
+  },
+  "shifted": {
+    "accuracy": 0.5979608156737305,
+    "macro_f1": 0.5724586404637891
+  },
+  "accuracy_change": -0.24930027988804482
+}

@@ -1,0 +1,58 @@
+{
+  "protocol": "shuffled_online_prequential",
+  "split": "test",
+  "shift": {
+    "brightness": 0.75,
+    "contrast": 1.35,
+    "saturation": 0.7
+  },
+  "batch_size": 64,
+  "seeds": [
+    42,
+    123,
+    2026
+  ],
+  "results": [
+    {
+      "method": "tent",
+      "seed": 42,
+      "accuracy": 0.7465181058495822,
+      "macro_f1": 0.6878510310744299
+    },
+    {
+      "method": "cafa_v2",
+      "seed": 42,
+      "accuracy": 0.7473537604456825,
+      "macro_f1": 0.6885927110341161
+    },
+    {
+      "method": "tent",
+      "seed": 123,
+      "accuracy": 0.7445682451253481,
+      "macro_f1": 0.6872511603482216
+    },
+    {
+      "method": "cafa_v2",
+      "seed": 123,
+      "accuracy": 0.7448467966573816,
+      "macro_f1": 0.6872741406218561
+    },
+    {
+      "method": "tent",
+      "seed": 2026,
+      "accuracy": 0.745125348189415,
+      "macro_f1": 0.6851165605289458
+    },
+    {
+      "method": "cafa_v2",
+      "seed": 2026,
+      "accuracy": 0.7452646239554318,
+      "macro_f1": 0.685306900593827
+    }
+  ],
+  "paired_accuracy_differences": [
+    0.0008356545961002437,
+    0.0002785515320334886,
+    0.0001392757660167998
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "method": "CAFA-TTA-v2-Agreement",
+  "protocol": "online_prequential",
+  "split": "val",
+  "shift": {
+    "brightness": 0.75,
+    "contrast": 1.35,
+    "saturation": 0.7
+  },
+  "batch_size": 64,
+  "learning_rate": 0.0001,
+  "confidence_threshold": 0.7,
+  "lambda_align": 0.05,
+  "accuracy": 0.7991803278688525,
+  "macro_f1": 0.8011300561480703,
+  "selection_rate": 0.7159136345461815,
+  "updated_batches": 157,
+  "mean_entropy_loss": 0.07334629894726595,
+  "mean_alignment_loss": 0.31822501929702274,
+  "mean_total_loss": 0.08925755008770402
+}

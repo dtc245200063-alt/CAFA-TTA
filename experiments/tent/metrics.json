@@ -1,0 +1,21 @@
+{
+  "protocol": "online_prequential",
+  "split": "val",
+  "batch_size": 64,
+  "learning_rate": 0.0001,
+  "shift": {
+    "brightness": 0.75,
+    "contrast": 1.35,
+    "saturation": 0.7
+  },
+  "source": {
+    "accuracy": 0.12035185925629747,
+    "macro_f1": 0.04969408320239437
+  },
+  "tent": {
+    "accuracy": 0.7985805677728909,
+    "macro_f1": 0.8005128327688443
+  },
+  "accuracy_change": 0.6782287085165934,
+  "mean_tent_loss": 0.37512477017511986
+}
