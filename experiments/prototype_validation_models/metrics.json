@@ -1,0 +1,73 @@
+{
+  "split": "val",
+  "shift": {
+    "brightness": 0.75,
+    "contrast": 1.35,
+    "saturation": 0.7
+  },
+  "batch_size": 64,
+  "models": {
+    "enhanced": {
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "prototypes": "source_prototypes_enhanced.pt"
+    },
+    "robust": {
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "prototypes": "source_prototypes_robust.pt"
+    },
+    "balanced": {
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "prototypes": "source_prototypes_balanced.pt"
+    }
+  },
+  "results": {
+    "enhanced": {
+      "source_bn": {
+        "classifier_accuracy": 0.16303478608556576,
+        "prototype_accuracy": 0.10515793682526989,
+        "classifier_prototype_agreement": 0.5208916433426629,
+        "mean_true_class_cosine": 0.41618978486257474,
+        "mean_nearest_cosine": 0.8176989561078645
+      },
+      "target_batch_bn": {
+        "classifier_accuracy": 0.8315673730507797,
+        "prototype_accuracy": 0.8066773290683726,
+        "classifier_prototype_agreement": 0.8957417033186725,
+        "mean_true_class_cosine": 0.7672676713120599,
+        "mean_nearest_cosine": 0.7870223582243738
+      }
+    },
+    "robust": {
+      "source_bn": {
+        "classifier_accuracy": 0.8206717313074771,
+        "prototype_accuracy": 0.7421031587365055,
+        "classifier_prototype_agreement": 0.8164734106357457,
+        "mean_true_class_cosine": 0.7465765034852148,
+        "mean_nearest_cosine": 0.7810812415908881
+      },
+      "target_batch_bn": {
+        "classifier_accuracy": 0.8052778888444622,
+        "prototype_accuracy": 0.789484206317473,
+        "classifier_prototype_agreement": 0.8754498200719713,
+        "mean_true_class_cosine": 0.7734193799973297,
+        "mean_nearest_cosine": 0.797255492505909
+      }
+    },
+    "balanced": {
+      "source_bn": {
+        "classifier_accuracy": 0.7715913634546182,
+        "prototype_accuracy": 0.679828068772491,
+        "classifier_prototype_agreement": 0.7561975209916033,
+        "mean_true_class_cosine": 0.6792849710777921,
+        "mean_nearest_cosine": 0.720542590268275
+      },
+      "target_batch_bn": {
+        "classifier_accuracy": 0.8234706117552979,
+        "prototype_accuracy": 0.8131747301079568,
+        "classifier_prototype_agreement": 0.885045981607357,
+        "mean_true_class_cosine": 0.7758805441980312,
+        "mean_nearest_cosine": 0.7956953909529633
+      }
+    }
+  }
+}

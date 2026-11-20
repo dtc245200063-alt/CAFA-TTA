@@ -1,0 +1,530 @@
+{
+  "protocol": "ordered_online_prequential",
+  "split": "val",
+  "seed": 42,
+  "shuffle": false,
+  "batch_size": 64,
+  "learning_rate": 0.0001,
+  "entropy_floor": 0.2,
+  "lambda_align": 0.05,
+  "min_samples": 2,
+  "models": {
+    "enhanced": {
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "prototypes": "source_prototypes_enhanced.pt"
+    },
+    "robust": {
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "prototypes": "source_prototypes_robust.pt"
+    },
+    "balanced": {
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "prototypes": "source_prototypes_balanced.pt"
+    }
+  },
+  "shifts": {
+    "original": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "light": [
+      0.95,
+      1.05,
+      0.95
+    ],
+    "medium": [
+      0.85,
+      1.15,
+      0.85
+    ],
+    "strong": [
+      0.75,
+      1.35,
+      0.7
+    ]
+  },
+  "shift_factor_order": [
+    "brightness",
+    "contrast",
+    "saturation"
+  ],
+  "methods": [
+    "source_only",
+    "bn_only",
+    "tent",
+    "cafa_v3"
+  ],
+  "completed_runs": 48,
+  "total_runs": 48,
+  "results": [
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "shift": "original",
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.9540183926429429,
+      "macro_f1": 0.9538908027951933
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "shift": "original",
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.9213314674130347,
+      "macro_f1": 0.9215120448802371
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "shift": "original",
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.924030387844862,
+      "macro_f1": 0.9241041139882739
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "shift": "original",
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.924030387844862,
+      "macro_f1": 0.9240999657528458,
+      "agreement_rate": 0.9417233106757297,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "shift": "light",
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.6643342662934826,
+      "macro_f1": 0.6426617551446705
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "shift": "light",
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.9158336665333866,
+      "macro_f1": 0.9160068850204159
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "shift": "light",
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.9173330667732906,
+      "macro_f1": 0.9175257245975325
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "shift": "light",
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.9175329868052778,
+      "macro_f1": 0.917756135335271,
+      "agreement_rate": 0.9388244702119153,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "shift": "medium",
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.226609356257497,
+      "macro_f1": 0.14015651781764835
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "shift": "medium",
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.8922431027588964,
+      "macro_f1": 0.8929198368637086
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "shift": "medium",
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.8982407037185126,
+      "macro_f1": 0.8987820616636072
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "shift": "medium",
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.8983406637345062,
+      "macro_f1": 0.8988855117720108,
+      "agreement_rate": 0.9277289084366254,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "shift": "strong",
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.16303478608556576,
+      "macro_f1": 0.0718549610586378
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "shift": "strong",
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.8315673730507797,
+      "macro_f1": 0.8328167745316022
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "shift": "strong",
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.8396641343462615,
+      "macro_f1": 0.8408346733122418
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "shift": "strong",
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.8402638944422232,
+      "macro_f1": 0.8414069869195748,
+      "agreement_rate": 0.8987405037984806,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "shift": "original",
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.8957417033186725,
+      "macro_f1": 0.8969052627398943
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "shift": "original",
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.8688524590163934,
+      "macro_f1": 0.8692715328927645
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "shift": "original",
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.8749500199920032,
+      "macro_f1": 0.8748648063076707
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "shift": "original",
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.8745501799280287,
+      "macro_f1": 0.8743865322516948,
+      "agreement_rate": 0.9036385445821671,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "shift": "light",
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.8884446221511395,
+      "macro_f1": 0.8903181052945287
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "shift": "light",
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.8639544182327069,
+      "macro_f1": 0.8641790712169843
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "shift": "light",
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.8711515393842463,
+      "macro_f1": 0.8708732858814392
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "shift": "light",
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.8702518992403039,
+      "macro_f1": 0.8698982948998392,
+      "agreement_rate": 0.90343862455018,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "shift": "medium",
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.8719512195121951,
+      "macro_f1": 0.8729018026702428
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "shift": "medium",
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.8479608156737305,
+      "macro_f1": 0.8481365774188366
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "shift": "medium",
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.8556577369052379,
+      "macro_f1": 0.8550971269393833
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "shift": "medium",
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.8552578968412635,
+      "macro_f1": 0.8546278032868126,
+      "agreement_rate": 0.896141543382647,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "shift": "strong",
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.8206717313074771,
+      "macro_f1": 0.8222639163502292
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "shift": "strong",
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.8052778888444622,
+      "macro_f1": 0.8049461006645388
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "shift": "strong",
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.8161735305877649,
+      "macro_f1": 0.8153370727517643
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "shift": "strong",
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.8162734906037585,
+      "macro_f1": 0.8153592070118341,
+      "agreement_rate": 0.8847461015593763,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "shift": "original",
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.9311275489804078,
+      "macro_f1": 0.9310477574086006
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "shift": "original",
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.8941423430627748,
+      "macro_f1": 0.8948371155169585
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "shift": "original",
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.8985405837664934,
+      "macro_f1": 0.8991025999012331
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "shift": "original",
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.8992403038784487,
+      "macro_f1": 0.8997974118160718,
+      "agreement_rate": 0.9199320271891244,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "shift": "light",
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.9130347860855658,
+      "macro_f1": 0.9126679214610629
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "shift": "light",
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.8896441423430628,
+      "macro_f1": 0.8902157344320367
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "shift": "light",
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.8940423830467813,
+      "macro_f1": 0.8944638725602047
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "shift": "light",
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.8942423030787685,
+      "macro_f1": 0.8946493195202498,
+      "agreement_rate": 0.9161335465813675,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "shift": "medium",
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.8688524590163934,
+      "macro_f1": 0.8674558312635031
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "shift": "medium",
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.8712514994002399,
+      "macro_f1": 0.8717178205263553
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "shift": "medium",
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.8782487005197921,
+      "macro_f1": 0.8786259390078531
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "shift": "medium",
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.8782487005197921,
+      "macro_f1": 0.8785860404114341,
+      "agreement_rate": 0.9101359456217513,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "shift": "strong",
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.7715913634546182,
+      "macro_f1": 0.7733220163198082
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "shift": "strong",
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.8234706117552979,
+      "macro_f1": 0.8240588137500577
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "shift": "strong",
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.8300679728108756,
+      "macro_f1": 0.8305610962898822
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "shift": "strong",
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.8308676529388245,
+      "macro_f1": 0.831317444386593,
+      "agreement_rate": 0.8905437824870052,
+      "updated_batches": 157,
+      "total_batches": 157
+    }
+  ]
+}

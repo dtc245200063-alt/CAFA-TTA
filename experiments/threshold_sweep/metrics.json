@@ -1,0 +1,331 @@
+{
+  "split": "val",
+  "seed": 42,
+  "shuffle": false,
+  "batch_size": 64,
+  "shift": {
+    "brightness": 0.75,
+    "contrast": 1.35,
+    "saturation": 0.7
+  },
+  "configs": {
+    "threshold_0_0": {
+      "threshold": 0.0,
+      "lambda_align": 0.05
+    },
+    "threshold_0_5": {
+      "threshold": 0.5,
+      "lambda_align": 0.05
+    },
+    "threshold_0_6": {
+      "threshold": 0.6,
+      "lambda_align": 0.05
+    },
+    "threshold_0_7": {
+      "threshold": 0.7,
+      "lambda_align": 0.05
+    }
+  },
+  "results": [
+    {
+      "model": "enhanced",
+      "mode": "threshold_0_0",
+      "method": "CAFA-v1-ablation",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "prototype_file": "source_prototypes_enhanced.pt",
+      "split": "val",
+      "protocol": "online_prequential",
+      "seed": 42,
+      "shuffle": false,
+      "batch_size": 64,
+      "learning_rate": 0.0001,
+      "shift": {
+        "brightness": 0.75,
+        "contrast": 1.35,
+        "saturation": 0.7
+      },
+      "threshold": 0.0,
+      "lambda_align": 0.05,
+      "accuracy": 0.8402638944422232,
+      "macro_f1": 0.8414279002624152,
+      "selection_rate": 1.0,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "enhanced",
+      "mode": "threshold_0_5",
+      "method": "CAFA-v1-ablation",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "prototype_file": "source_prototypes_enhanced.pt",
+      "split": "val",
+      "protocol": "online_prequential",
+      "seed": 42,
+      "shuffle": false,
+      "batch_size": 64,
+      "learning_rate": 0.0001,
+      "shift": {
+        "brightness": 0.75,
+        "contrast": 1.35,
+        "saturation": 0.7
+      },
+      "threshold": 0.5,
+      "lambda_align": 0.05,
+      "accuracy": 0.8401639344262295,
+      "macro_f1": 0.8413164266225943,
+      "selection_rate": 0.9648140743702519,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "enhanced",
+      "mode": "threshold_0_6",
+      "method": "CAFA-v1-ablation",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "prototype_file": "source_prototypes_enhanced.pt",
+      "split": "val",
+      "protocol": "online_prequential",
+      "seed": 42,
+      "shuffle": false,
+      "batch_size": 64,
+      "learning_rate": 0.0001,
+      "shift": {
+        "brightness": 0.75,
+        "contrast": 1.35,
+        "saturation": 0.7
+      },
+      "threshold": 0.6,
+      "lambda_align": 0.05,
+      "accuracy": 0.840063974410236,
+      "macro_f1": 0.841173602699876,
+      "selection_rate": 0.9119352259096362,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "enhanced",
+      "mode": "threshold_0_7",
+      "method": "CAFA-v1-ablation",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "prototype_file": "source_prototypes_enhanced.pt",
+      "split": "val",
+      "protocol": "online_prequential",
+      "seed": 42,
+      "shuffle": false,
+      "batch_size": 64,
+      "learning_rate": 0.0001,
+      "shift": {
+        "brightness": 0.75,
+        "contrast": 1.35,
+        "saturation": 0.7
+      },
+      "threshold": 0.7,
+      "lambda_align": 0.05,
+      "accuracy": 0.8393642542982807,
+      "macro_f1": 0.8404943701993743,
+      "selection_rate": 0.8148740503798481,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "robust",
+      "mode": "threshold_0_0",
+      "method": "CAFA-v1-ablation",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "prototype_file": "source_prototypes_robust.pt",
+      "split": "val",
+      "protocol": "online_prequential",
+      "seed": 42,
+      "shuffle": false,
+      "batch_size": 64,
+      "learning_rate": 0.0001,
+      "shift": {
+        "brightness": 0.75,
+        "contrast": 1.35,
+        "saturation": 0.7
+      },
+      "threshold": 0.0,
+      "lambda_align": 0.05,
+      "accuracy": 0.8163734506197521,
+      "macro_f1": 0.815565275563285,
+      "selection_rate": 1.0,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "robust",
+      "mode": "threshold_0_5",
+      "method": "CAFA-v1-ablation",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "prototype_file": "source_prototypes_robust.pt",
+      "split": "val",
+      "protocol": "online_prequential",
+      "seed": 42,
+      "shuffle": false,
+      "batch_size": 64,
+      "learning_rate": 0.0001,
+      "shift": {
+        "brightness": 0.75,
+        "contrast": 1.35,
+        "saturation": 0.7
+      },
+      "threshold": 0.5,
+      "lambda_align": 0.05,
+      "accuracy": 0.8160735705717713,
+      "macro_f1": 0.8151185610074411,
+      "selection_rate": 0.9093362654938025,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "robust",
+      "mode": "threshold_0_6",
+      "method": "CAFA-v1-ablation",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "prototype_file": "source_prototypes_robust.pt",
+      "split": "val",
+      "protocol": "online_prequential",
+      "seed": 42,
+      "shuffle": false,
+      "batch_size": 64,
+      "learning_rate": 0.0001,
+      "shift": {
+        "brightness": 0.75,
+        "contrast": 1.35,
+        "saturation": 0.7
+      },
+      "threshold": 0.6,
+      "lambda_align": 0.05,
+      "accuracy": 0.8149740103958416,
+      "macro_f1": 0.8138093752593494,
+      "selection_rate": 0.7986805277888844,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "robust",
+      "mode": "threshold_0_7",
+      "method": "CAFA-v1-ablation",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "prototype_file": "source_prototypes_robust.pt",
+      "split": "val",
+      "protocol": "online_prequential",
+      "seed": 42,
+      "shuffle": false,
+      "batch_size": 64,
+      "learning_rate": 0.0001,
+      "shift": {
+        "brightness": 0.75,
+        "contrast": 1.35,
+        "saturation": 0.7
+      },
+      "threshold": 0.7,
+      "lambda_align": 0.05,
+      "accuracy": 0.8147740903638545,
+      "macro_f1": 0.8135577959194519,
+      "selection_rate": 0.6653338664534186,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "balanced",
+      "mode": "threshold_0_0",
+      "method": "CAFA-v1-ablation",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "prototype_file": "source_prototypes_balanced.pt",
+      "split": "val",
+      "protocol": "online_prequential",
+      "seed": 42,
+      "shuffle": false,
+      "batch_size": 64,
+      "learning_rate": 0.0001,
+      "shift": {
+        "brightness": 0.75,
+        "contrast": 1.35,
+        "saturation": 0.7
+      },
+      "threshold": 0.0,
+      "lambda_align": 0.05,
+      "accuracy": 0.8303678528588565,
+      "macro_f1": 0.8308763832978705,
+      "selection_rate": 1.0,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "balanced",
+      "mode": "threshold_0_5",
+      "method": "CAFA-v1-ablation",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "prototype_file": "source_prototypes_balanced.pt",
+      "split": "val",
+      "protocol": "online_prequential",
+      "seed": 42,
+      "shuffle": false,
+      "batch_size": 64,
+      "learning_rate": 0.0001,
+      "shift": {
+        "brightness": 0.75,
+        "contrast": 1.35,
+        "saturation": 0.7
+      },
+      "threshold": 0.5,
+      "lambda_align": 0.05,
+      "accuracy": 0.8305677728908437,
+      "macro_f1": 0.8309882986478963,
+      "selection_rate": 0.9387245101959216,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "balanced",
+      "mode": "threshold_0_6",
+      "method": "CAFA-v1-ablation",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "prototype_file": "source_prototypes_balanced.pt",
+      "split": "val",
+      "protocol": "online_prequential",
+      "seed": 42,
+      "shuffle": false,
+      "batch_size": 64,
+      "learning_rate": 0.0001,
+      "shift": {
+        "brightness": 0.75,
+        "contrast": 1.35,
+        "saturation": 0.7
+      },
+      "threshold": 0.6,
+      "lambda_align": 0.05,
+      "accuracy": 0.8311675329868052,
+      "macro_f1": 0.8314891885476536,
+      "selection_rate": 0.8615553778488605,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "balanced",
+      "mode": "threshold_0_7",
+      "method": "CAFA-v1-ablation",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "prototype_file": "source_prototypes_balanced.pt",
+      "split": "val",
+      "protocol": "online_prequential",
+      "seed": 42,
+      "shuffle": false,
+      "batch_size": 64,
+      "learning_rate": 0.0001,
+      "shift": {
+        "brightness": 0.75,
+        "contrast": 1.35,
+        "saturation": 0.7
+      },
+      "threshold": 0.7,
+      "lambda_align": 0.05,
+      "accuracy": 0.8300679728108756,
+      "macro_f1": 0.8302813422571015,
+      "selection_rate": 0.741203518592563,
+      "updated_batches": 157,
+      "total_batches": 157
+    }
+  ]
+}

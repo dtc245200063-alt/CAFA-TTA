@@ -1,0 +1,16 @@
+﻿metric,value,unit
+Verified prediction files,423,files
+Paired comparisons,117,comparisons
+Accuracy improvement,0.06213841868437969,pp
+Macro-F1 improvement,0.044814266942414804,pp
+Conditional CI lower,0.05392174368497489,pp
+Conditional CI upper,0.07047115682213174,pp
+Wins,95,comparisons
+Ties,11,comparisons
+Losses,11,comparisons
+Corrected events,812,prediction events
+Harmed events,290,prediction events
+Net correct events,522,prediction events
+McNemar raw significant,31,comparisons
+McNemar Holm significant,1,comparisons
+Minimum Holm p-value,2.6583991711959243e-05,p-value

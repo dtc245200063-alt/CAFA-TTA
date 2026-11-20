@@ -1,0 +1,141 @@
+{
+  "project": "CAFA-TTA",
+  "experiment": "STARC-9 external evaluation",
+  "algorithm": "CAFA-TTA v3",
+  "source_dataset": "PathMNIST",
+  "target_dataset": "STARC-9",
+  "target_subset": "STANFORD-CRC-HE-VAL-SMALL-NORMALIZED",
+  "dataset_revision": "06e80900204d099b2f0409772f94baf1687f754f",
+  "archive_sha256": "088281de09bfe4d57b4a8e356a99cdb9b002a08a0ff7c44910aee0b4de81d3f3",
+  "source_models": [
+    "enhanced",
+    "robust",
+    "balanced"
+  ],
+  "backbone": "ResNet-18",
+  "total_archive_images": 18000,
+  "target_images": 12000,
+  "target_num_classes": 6,
+  "source_num_classes": 9,
+  "label_mapping": {
+    "ADI": 0,
+    "LYM": 3,
+    "MUC": 4,
+    "MUS": 5,
+    "NOR": 6,
+    "TUM": 8
+  },
+  "target_class_ids": [
+    0,
+    3,
+    4,
+    5,
+    6,
+    8
+  ],
+  "excluded_target_classes": [
+    "BLD",
+    "FCT",
+    "NCS"
+  ],
+  "absent_source_class_ids": [
+    1,
+    2,
+    7
+  ],
+  "input_size": [
+    28,
+    28
+  ],
+  "input_color_mode": "RGB",
+  "resize_interpolation": "bilinear",
+  "resize_antialias": true,
+  "normalization_mean": [
+    0.5,
+    0.5,
+    0.5
+  ],
+  "normalization_std": [
+    0.5,
+    0.5,
+    0.5
+  ],
+  "batch_size": 64,
+  "learning_rate": 0.0001,
+  "entropy_floor": 0.2,
+  "lambda_align": 0.05,
+  "min_samples": 2,
+  "seeds": [
+    42,
+    123,
+    2026
+  ],
+  "methods": [
+    "source_only",
+    "bn_only",
+    "tent",
+    "cafa_v3"
+  ],
+  "source_only_seeds": [
+    42
+  ],
+  "expected_runs": 30,
+  "expected_batches_per_run": 188,
+  "dataset_order": "sorted_archive_paths",
+  "stream_order": "seeded_shuffle",
+  "evaluation_protocol": "online_prequential",
+  "predict_before_parameter_update": true,
+  "reset_model_before_each_run": true,
+  "reset_optimizer_before_each_run": true,
+  "target_batch_statistics_for_adaptation": true,
+  "restrict_output_logits": false,
+  "restrict_source_prototypes": false,
+  "synthetic_corruption": false,
+  "target_labels_used_for_subset_selection": true,
+  "target_labels_used_for_metrics": true,
+  "target_labels_used_for_adaptation": false,
+  "training_on_target": false,
+  "hyperparameter_tuning_on_target": false,
+  "metrics": {
+    "primary": "accuracy",
+    "secondary": [
+      "macro_f1_target_6_classes",
+      "macro_f1_all_9_classes",
+      "per_class_precision",
+      "per_class_recall",
+      "per_class_f1",
+      "confusion_matrix_9x9",
+      "absent_class_prediction_rate"
+    ],
+    "macro_f1_primary_class_ids": [
+      0,
+      3,
+      4,
+      5,
+      6,
+      8
+    ],
+    "zero_division": 0,
+    "absent_class_predictions_count_as_errors": true
+  },
+  "configuration_frozen": true,
+  "limitations": [
+    "Partial-label-space external evaluation.",
+    "Target subset selected using class labels.",
+    "Label definitions may not be identical.",
+    "Target images are stain-normalized.",
+    "Original patch sizes differ from the source.",
+    "Resizing to 28x28 reduces spatial detail.",
+    "Patient and slide identifiers are not yet available.",
+    "No patient-level diagnostic claims.",
+    "Stream seeds are not independent training runs."
+  ],
+  "input_hashes": {
+    "data/raw/starc9/dataset_manifest.json": "923FAF1EBC0FC8912A6D8CC2E708996CA8058DD633CFD463EEA999E76DBCE5FC",
+    "data/raw/starc9/dataset_inspection.json": "5BBA92C76DBFDC4BBA90296C31B001829FE699C9031D2302ED73A1F7D58B888C",
+    "experiments/reproducibility/final_config.json": "33C18321957616D3385C80519325F7BED0530F7297C84BEAFBD734FA726D8B9D",
+    "experiments/reproducibility/checkpoint_hashes.csv": "4EF1BD54DF2DC2B9C6475CE39034CECBA53659CC65403746F4E9422CA26BBD99",
+    "experiments/reproducibility/algorithm_hashes.csv": "596B23FBA28E107BFC92F57F5D45D5396A8B65A9D2F6A6093F68CEEE0CA6BAC6"
+  },
+  "frozen_at_utc": "2026-11-18T20:53:49.291603+00:00"
+}

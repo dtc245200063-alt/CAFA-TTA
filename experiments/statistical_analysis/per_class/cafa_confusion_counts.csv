@@ -1,0 +1,10 @@
+﻿true_class_id,true_class_name,predicted_class_0,predicted_class_1,predicted_class_2,predicted_class_3,predicted_class_4,predicted_class_5,predicted_class_6,predicted_class_7,predicted_class_8
+0,adipose,136904,5888,653,6,3779,6087,1725,1372,132
+1,background,0,78226,9884,3564,7,3347,97,2139,1835
+2,debris,557,154,25989,1635,62,6669,4,2952,1641
+3,lymphocytes,223,218,6276,57276,1182,512,1222,3044,4225
+4,mucus,5424,7315,3125,273,68550,1889,2343,28217,3959
+5,smooth muscle,3624,2150,10364,171,1438,33027,379,15372,2739
+6,normal colon mucosa,1056,17,3987,3353,7027,240,57951,1010,12056
+7,cancer-associated stroma,519,171,12590,1139,692,6942,350,18911,7943
+8,colorectal adenocarcinoma epithelium,313,116,10596,4224,2270,439,11231,1642,113430

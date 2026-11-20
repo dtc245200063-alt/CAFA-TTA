@@ -1,0 +1,329 @@
+{
+  "protocol": "shuffled_online_prequential",
+  "split": "val",
+  "shift": {
+    "brightness": 0.75,
+    "contrast": 1.35,
+    "saturation": 0.7
+  },
+  "batch_size": 64,
+  "learning_rate": 0.0001,
+  "entropy_floor": 0.2,
+  "lambda_align": 0.05,
+  "min_samples": 2,
+  "seeds": [
+    42,
+    123,
+    2026
+  ],
+  "models": {
+    "enhanced": {
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "prototypes": "source_prototypes_enhanced.pt"
+    },
+    "robust": {
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "prototypes": "source_prototypes_robust.pt"
+    },
+    "balanced": {
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "prototypes": "source_prototypes_balanced.pt"
+    }
+  },
+  "methods": [
+    "tent",
+    "cafa_v3"
+  ],
+  "results": [
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "method": "tent",
+      "seed": 42,
+      "accuracy": 0.8364654138344663,
+      "macro_f1": 0.8370674762966875
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "method": "cafa_v3",
+      "seed": 42,
+      "accuracy": 0.8369652139144342,
+      "macro_f1": 0.8374731662143664,
+      "agreement_rate": 0.9042383046781287,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "method": "tent",
+      "seed": 123,
+      "accuracy": 0.8375649740103959,
+      "macro_f1": 0.8387297538384196
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "method": "cafa_v3",
+      "seed": 123,
+      "accuracy": 0.8384646141543383,
+      "macro_f1": 0.8396038492193655,
+      "agreement_rate": 0.8992403038784487,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "method": "tent",
+      "seed": 2026,
+      "accuracy": 0.8403638544582167,
+      "macro_f1": 0.8414206728832467
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "method": "cafa_v3",
+      "seed": 2026,
+      "accuracy": 0.8404638144742104,
+      "macro_f1": 0.8415141986693939,
+      "agreement_rate": 0.9010395841663335,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "method": "tent",
+      "seed": 42,
+      "accuracy": 0.8184726109556177,
+      "macro_f1": 0.8177344310407495
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "method": "cafa_v3",
+      "seed": 42,
+      "accuracy": 0.8191723310675729,
+      "macro_f1": 0.8183110658553717,
+      "agreement_rate": 0.8841463414634146,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "method": "tent",
+      "seed": 123,
+      "accuracy": 0.8159736105557777,
+      "macro_f1": 0.8156607795705317
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "method": "cafa_v3",
+      "seed": 123,
+      "accuracy": 0.8164734106357457,
+      "macro_f1": 0.8160541763612226,
+      "agreement_rate": 0.8790483806477409,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "method": "tent",
+      "seed": 2026,
+      "accuracy": 0.810375849660136,
+      "macro_f1": 0.8099214898850746
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "method": "cafa_v3",
+      "seed": 2026,
+      "accuracy": 0.8117752898840463,
+      "macro_f1": 0.8112647204734339,
+      "agreement_rate": 0.8794482207117154,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "method": "tent",
+      "seed": 42,
+      "accuracy": 0.8306677329068373,
+      "macro_f1": 0.8309392947182993
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "method": "cafa_v3",
+      "seed": 42,
+      "accuracy": 0.8321671331467413,
+      "macro_f1": 0.8323979155444087,
+      "agreement_rate": 0.891843262694922,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "method": "tent",
+      "seed": 123,
+      "accuracy": 0.8325669732107157,
+      "macro_f1": 0.8331718951165618
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "method": "cafa_v3",
+      "seed": 123,
+      "accuracy": 0.8333666533386646,
+      "macro_f1": 0.8339341196592517,
+      "agreement_rate": 0.897640943622551,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "method": "tent",
+      "seed": 2026,
+      "accuracy": 0.8297680927628949,
+      "macro_f1": 0.8302207223933115
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "method": "cafa_v3",
+      "seed": 2026,
+      "accuracy": 0.8300679728108756,
+      "macro_f1": 0.8304317758857482,
+      "agreement_rate": 0.8892443022790884,
+      "updated_batches": 157,
+      "total_batches": 157
+    }
+  ],
+  "summary": {
+    "enhanced": {
+      "tent": {
+        "accuracy_mean": 0.8381314141010262,
+        "accuracy_std": 0.00201000015085372,
+        "macro_f1_mean": 0.8390726343394513,
+        "macro_f1_std": 0.002196760207395985
+      },
+      "cafa_v3": {
+        "accuracy_mean": 0.8386312141809943,
+        "accuracy_std": 0.0017552401960637207,
+        "macro_f1_mean": 0.8395304047010419,
+        "macro_f1_std": 0.0020215171032173487,
+        "agreement_mean": 0.9015060642409702,
+        "agreement_std": 0.0025314434110652127
+      },
+      "paired_difference": {
+        "seeds": [
+          42,
+          123,
+          2026
+        ],
+        "accuracy_per_seed_pp": [
+          0.04998000799679714,
+          0.08996401439423929,
+          0.009996001599366089
+        ],
+        "accuracy_mean_pp": 0.049980007996800836,
+        "accuracy_std_pp": 0.0399840063974366,
+        "macro_f1_per_seed_pp": [
+          0.04056899176788642,
+          0.08740953809458496,
+          0.00935257861471861
+        ],
+        "macro_f1_mean_pp": 0.045777036159063325,
+        "wins": 3,
+        "ties": 0,
+        "losses": 0
+      }
+    },
+    "robust": {
+      "tent": {
+        "accuracy_mean": 0.8149406903905105,
+        "accuracy_std": 0.004146031707532466,
+        "macro_f1_mean": 0.814438900165452,
+        "macro_f1_std": 0.004047252689903137
+      },
+      "cafa_v3": {
+        "accuracy_mean": 0.8158070105291216,
+        "accuracy_std": 0.0037432768257608857,
+        "macro_f1_mean": 0.8152099875633426,
+        "macro_f1_std": 0.0035982269043569894,
+        "agreement_mean": 0.8808809809409569,
+        "agreement_std": 0.0028349431256038476
+      },
+      "paired_difference": {
+        "seeds": [
+          42,
+          123,
+          2026
+        ],
+        "accuracy_per_seed_pp": [
+          0.06997201119551821,
+          0.04998000799680824,
+          0.13994402239103643
+        ],
+        "accuracy_mean_pp": 0.08663201386112096,
+        "accuracy_std_pp": 0.04723926055829666,
+        "macro_f1_per_seed_pp": [
+          0.05766348146222233,
+          0.039339679069083644,
+          0.13432305883592788
+        ],
+        "macro_f1_mean_pp": 0.07710873978907795,
+        "wins": 3,
+        "ties": 0,
+        "losses": 0
+      }
+    },
+    "balanced": {
+      "tent": {
+        "accuracy_mean": 0.8310009329601492,
+        "accuracy_std": 0.0014288805572698492,
+        "macro_f1_mean": 0.8314439707427241,
+        "macro_f1_std": 0.001538953712051181
+      },
+      "cafa_v3": {
+        "accuracy_mean": 0.8318672530987605,
+        "accuracy_std": 0.0016696614442713153,
+        "macro_f1_mean": 0.8322546036964695,
+        "macro_f1_std": 0.001755564493622889,
+        "agreement_mean": 0.8929095028655204,
+        "agreement_std": 0.004298668112187175
+      },
+      "paired_difference": {
+        "seeds": [
+          42,
+          123,
+          2026
+        ],
+        "accuracy_per_seed_pp": [
+          0.14994002399040252,
+          0.0799680127948843,
+          0.029988004798076062
+        ],
+        "accuracy_mean_pp": 0.08663201386112096,
+        "accuracy_std_pp": 0.06025303651881095,
+        "macro_f1_per_seed_pp": [
+          0.14586208261093692,
+          0.07622245426899266,
+          0.021105349243677463
+        ],
+        "macro_f1_mean_pp": 0.08106329537453569,
+        "wins": 3,
+        "ties": 0,
+        "losses": 0
+      }
+    }
+  }
+}

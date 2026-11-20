@@ -1,0 +1,10 @@
+﻿true_class_id,true_class_name,predicted_class_0,predicted_class_1,predicted_class_2,predicted_class_3,predicted_class_4,predicted_class_5,predicted_class_6,predicted_class_7,predicted_class_8
+0,adipose,161,-81,1,0,-38,-30,-7,-7,1
+1,background,0,121,-63,-3,0,-28,-1,15,-41
+2,debris,0,-1,-4,7,-1,9,0,-9,-1
+3,lymphocytes,-4,0,-20,36,3,1,-9,-22,15
+4,mucus,15,5,-12,5,109,7,17,-154,8
+5,smooth muscle,4,-14,2,4,-2,63,1,-77,19
+6,normal colon mucosa,1,0,-6,22,-19,0,-26,-4,32
+7,cancer-associated stroma,-1,-2,0,5,2,19,-3,-54,34
+8,colorectal adenocarcinoma epithelium,-1,-3,-29,22,-3,1,-89,-14,116

@@ -1,0 +1,2865 @@
+{
+  "protocol": "ordered_online_prequential",
+  "split": "val",
+  "seed": 42,
+  "noise_seed": 2026,
+  "shuffle": false,
+  "batch_size": 64,
+  "learning_rate": 0.0001,
+  "entropy_floor": 0.2,
+  "lambda_align": 0.05,
+  "min_samples": 2,
+  "models": {
+    "enhanced": {
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "prototypes": "source_prototypes_enhanced.pt"
+    },
+    "robust": {
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "prototypes": "source_prototypes_robust.pt"
+    },
+    "balanced": {
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "prototypes": "source_prototypes_balanced.pt"
+    }
+  },
+  "corruptions": {
+    "gaussian_noise": {
+      "light": 0.02,
+      "medium": 0.05,
+      "strong": 0.1
+    },
+    "gaussian_blur": {
+      "light": 0.5,
+      "medium": 1.0,
+      "strong": 2.0
+    },
+    "hue_shift": {
+      "light": 0.03,
+      "medium": 0.07,
+      "strong": 0.15
+    }
+  },
+  "gaussian_blur_kernel_size": 13,
+  "methods": [
+    "source_only",
+    "bn_only",
+    "tent",
+    "cafa_v3"
+  ],
+  "completed_runs": 108,
+  "total_runs": 108,
+  "results": [
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "light",
+      "strength": 0.02,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.931827269092363,
+      "macro_f1": 0.9310051204389329
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "light",
+      "strength": 0.02,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.9159336265493803,
+      "macro_f1": 0.91652284506289
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "light",
+      "strength": 0.02,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.9184326269492203,
+      "macro_f1": 0.9188040564794279
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "light",
+      "strength": 0.02,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.9189324270291883,
+      "macro_f1": 0.9192685403958597,
+      "agreement_rate": 0.9365253898440624,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "medium",
+      "strength": 0.05,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.5815673730507797,
+      "macro_f1": 0.5642567889838314
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "medium",
+      "strength": 0.05,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.8486605357856857,
+      "macro_f1": 0.8511358623966789
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "medium",
+      "strength": 0.05,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.8533586565373851,
+      "macro_f1": 0.8553985664952383
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "medium",
+      "strength": 0.05,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.8540583766493403,
+      "macro_f1": 0.8560655197222347,
+      "agreement_rate": 0.9081367453018793,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "strong",
+      "strength": 0.1,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.21021591363454617,
+      "macro_f1": 0.13816298509324676
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "strong",
+      "strength": 0.1,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.6931227508996401,
+      "macro_f1": 0.6945902907321957
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "strong",
+      "strength": 0.1,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.6985205917632947,
+      "macro_f1": 0.6989629005124288
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "strong",
+      "strength": 0.1,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.6987205117952819,
+      "macro_f1": 0.6990943395266492,
+      "agreement_rate": 0.8547580967612954,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "light",
+      "strength": 0.5,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.8540583766493403,
+      "macro_f1": 0.854473302565134
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "light",
+      "strength": 0.5,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.9178328668532587,
+      "macro_f1": 0.9181949738801932
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "light",
+      "strength": 0.5,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.9221311475409836,
+      "macro_f1": 0.9223288477149981
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "light",
+      "strength": 0.5,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.922530987604958,
+      "macro_f1": 0.9226742301946886,
+      "agreement_rate": 0.9434226309476209,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "medium",
+      "strength": 1.0,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.4728108756497401,
+      "macro_f1": 0.407040318647363
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "medium",
+      "strength": 1.0,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.7883846461415434,
+      "macro_f1": 0.7899373701472545
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "medium",
+      "strength": 1.0,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.806077568972411,
+      "macro_f1": 0.8075593941673538
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "medium",
+      "strength": 1.0,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.8070771691323471,
+      "macro_f1": 0.808494653232221,
+      "agreement_rate": 0.8786485405837665,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "strong",
+      "strength": 2.0,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.3142742902838864,
+      "macro_f1": 0.2196485948987329
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "strong",
+      "strength": 2.0,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.5459816073570571,
+      "macro_f1": 0.5418313873613214
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "strong",
+      "strength": 2.0,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.5512794882047181,
+      "macro_f1": 0.5463535481650111
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "strong",
+      "strength": 2.0,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.5515793682526989,
+      "macro_f1": 0.5468185377101754,
+      "agreement_rate": 0.7674930027988804,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "light",
+      "strength": 0.03,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.35805677728908436,
+      "macro_f1": 0.329598877216719
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "light",
+      "strength": 0.03,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.8499600159936026,
+      "macro_f1": 0.8491037493965534
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "light",
+      "strength": 0.03,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.8597560975609756,
+      "macro_f1": 0.8588963108255735
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "light",
+      "strength": 0.03,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.8604558176729308,
+      "macro_f1": 0.859600778458156,
+      "agreement_rate": 0.895641743302679,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "medium",
+      "strength": 0.07,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.20851659336265493,
+      "macro_f1": 0.1115636061087879
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "medium",
+      "strength": 0.07,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.6636345461815274,
+      "macro_f1": 0.6577796187477253
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "medium",
+      "strength": 0.07,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.6748300679728109,
+      "macro_f1": 0.6695402573788439
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "medium",
+      "strength": 0.07,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.6765293882447021,
+      "macro_f1": 0.6710921939157205,
+      "agreement_rate": 0.7934826069572171,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "strong",
+      "strength": 0.15,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.21051579368252699,
+      "macro_f1": 0.10759554899071869
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "strong",
+      "strength": 0.15,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.43932427029188326,
+      "macro_f1": 0.432554660508652
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "strong",
+      "strength": 0.15,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.44432227109156336,
+      "macro_f1": 0.4368430993775276
+    },
+    {
+      "model": "enhanced",
+      "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "strong",
+      "strength": 0.15,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.44422231107556975,
+      "macro_f1": 0.4368462895411587,
+      "agreement_rate": 0.7902838864454218,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "light",
+      "strength": 0.02,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.8660535785685726,
+      "macro_f1": 0.8676754074267594
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "light",
+      "strength": 0.02,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.8286685325869653,
+      "macro_f1": 0.8282476640346901
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "light",
+      "strength": 0.02,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.8433626549380248,
+      "macro_f1": 0.8434937705552631
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "light",
+      "strength": 0.02,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.8441623350659736,
+      "macro_f1": 0.8442454127478634,
+      "agreement_rate": 0.8867453018792483,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "medium",
+      "strength": 0.05,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.5480807676929228,
+      "macro_f1": 0.531180116139597
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "medium",
+      "strength": 0.05,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.7444022391043582,
+      "macro_f1": 0.7385679207479533
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "medium",
+      "strength": 0.05,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.7472011195521792,
+      "macro_f1": 0.7407309269755441
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "medium",
+      "strength": 0.05,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.7478008796481408,
+      "macro_f1": 0.7414860226950921,
+      "agreement_rate": 0.8454618152738904,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "strong",
+      "strength": 0.1,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.256297481007597,
+      "macro_f1": 0.196377200917078
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "strong",
+      "strength": 0.1,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.6058576569372252,
+      "macro_f1": 0.5997896565721648
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "strong",
+      "strength": 0.1,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.6132546981207517,
+      "macro_f1": 0.6052661321977726
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "strong",
+      "strength": 0.1,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.6145541783286685,
+      "macro_f1": 0.6063697814593633,
+      "agreement_rate": 0.8002798880447821,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "light",
+      "strength": 0.5,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.7288084766093562,
+      "macro_f1": 0.7162460345136581
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "light",
+      "strength": 0.5,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.8589564174330268,
+      "macro_f1": 0.859715955956613
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "light",
+      "strength": 0.5,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.8699520191923231,
+      "macro_f1": 0.8700983443826361
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "light",
+      "strength": 0.5,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.8697520991603359,
+      "macro_f1": 0.8697692519030773,
+      "agreement_rate": 0.9030387844862056,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "medium",
+      "strength": 1.0,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.31457417033186724,
+      "macro_f1": 0.25425795238812937
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "medium",
+      "strength": 1.0,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.6655337864854058,
+      "macro_f1": 0.6402411855270275
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "medium",
+      "strength": 1.0,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.6814274290283886,
+      "macro_f1": 0.6549236110276492
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "medium",
+      "strength": 1.0,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.6815273890443823,
+      "macro_f1": 0.6550279611772457,
+      "agreement_rate": 0.8168732506997202,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "strong",
+      "strength": 2.0,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.17113154738104758,
+      "macro_f1": 0.12013505648449106
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "strong",
+      "strength": 2.0,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.46291483406637346,
+      "macro_f1": 0.44561707886310525
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "strong",
+      "strength": 2.0,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.4635145941623351,
+      "macro_f1": 0.4429942085958889
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "strong",
+      "strength": 2.0,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.46361455417832864,
+      "macro_f1": 0.4430937638105382,
+      "agreement_rate": 0.7674930027988804,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "hue_shift",
+      "severity": "light",
+      "strength": 0.03,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.8695521791283487,
+      "macro_f1": 0.8716336012233022
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "hue_shift",
+      "severity": "light",
+      "strength": 0.03,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.8348660535785686,
+      "macro_f1": 0.8353467912365811
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "hue_shift",
+      "severity": "light",
+      "strength": 0.03,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.8446621351459416,
+      "macro_f1": 0.844696033585917
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "hue_shift",
+      "severity": "light",
+      "strength": 0.03,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.8442622950819673,
+      "macro_f1": 0.844137799190189,
+      "agreement_rate": 0.8887445021991204,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "hue_shift",
+      "severity": "medium",
+      "strength": 0.07,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.7614954018392643,
+      "macro_f1": 0.753790242820153
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "hue_shift",
+      "severity": "medium",
+      "strength": 0.07,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.7755897640943623,
+      "macro_f1": 0.7743613005164675
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "hue_shift",
+      "severity": "medium",
+      "strength": 0.07,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.7873850459816074,
+      "macro_f1": 0.7858602842212431
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "hue_shift",
+      "severity": "medium",
+      "strength": 0.07,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.7882846861255498,
+      "macro_f1": 0.7866145380926425,
+      "agreement_rate": 0.8605557776889244,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "hue_shift",
+      "severity": "strong",
+      "strength": 0.15,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.44842063174730107,
+      "macro_f1": 0.42410914082598544
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "hue_shift",
+      "severity": "strong",
+      "strength": 0.15,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.6628348660535786,
+      "macro_f1": 0.6556793929084967
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "hue_shift",
+      "severity": "strong",
+      "strength": 0.15,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.6746301479408237,
+      "macro_f1": 0.6671712214098271
+    },
+    {
+      "model": "robust",
+      "checkpoint": "resnet18_pathmnist_robust_best.pt",
+      "corruption": "hue_shift",
+      "severity": "strong",
+      "strength": 0.15,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.6759296281487405,
+      "macro_f1": 0.6684171515859283,
+      "agreement_rate": 0.818172730907637,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "light",
+      "strength": 0.02,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.9035385845661735,
+      "macro_f1": 0.9024991814823152
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "light",
+      "strength": 0.02,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.8789484206317473,
+      "macro_f1": 0.880184493290139
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "light",
+      "strength": 0.02,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.8880447820871651,
+      "macro_f1": 0.8888129868978445
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "light",
+      "strength": 0.02,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.8879448220711715,
+      "macro_f1": 0.8886947456961583,
+      "agreement_rate": 0.9193322670931627,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "medium",
+      "strength": 0.05,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.5332866853258696,
+      "macro_f1": 0.511795954760446
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "medium",
+      "strength": 0.05,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.799780087964814,
+      "macro_f1": 0.8022241591854699
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "medium",
+      "strength": 0.05,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.8113754498200719,
+      "macro_f1": 0.8138635106226213
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "medium",
+      "strength": 0.05,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.8116753298680528,
+      "macro_f1": 0.814104500983877,
+      "agreement_rate": 0.8901439424230307,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "strong",
+      "strength": 0.1,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.20511795281887246,
+      "macro_f1": 0.13920244950044536
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "strong",
+      "strength": 0.1,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.6457417033186725,
+      "macro_f1": 0.6479875589716476
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "strong",
+      "strength": 0.1,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.6540383846461415,
+      "macro_f1": 0.6548914145249165
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_noise",
+      "severity": "strong",
+      "strength": 0.1,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.654938024790084,
+      "macro_f1": 0.6557377303245354,
+      "agreement_rate": 0.8189724110355857,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "light",
+      "strength": 0.5,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.760795681727309,
+      "macro_f1": 0.75891581033339
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "light",
+      "strength": 0.5,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.8947421031587365,
+      "macro_f1": 0.8954961937858208
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "light",
+      "strength": 0.5,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.8984406237504998,
+      "macro_f1": 0.8988587581788864
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "light",
+      "strength": 0.5,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.898640543782487,
+      "macro_f1": 0.8990374989190355,
+      "agreement_rate": 0.922530987604958,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "medium",
+      "strength": 1.0,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.35005997600959615,
+      "macro_f1": 0.29507313117478134
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "medium",
+      "strength": 1.0,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.6830267892842863,
+      "macro_f1": 0.6572435427208855
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "medium",
+      "strength": 1.0,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.6990203918432627,
+      "macro_f1": 0.670330801715437
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "medium",
+      "strength": 1.0,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.6995201919232307,
+      "macro_f1": 0.670806359998878,
+      "agreement_rate": 0.8024790083966413,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "strong",
+      "strength": 2.0,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.2614954018392643,
+      "macro_f1": 0.19389660720984614
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "strong",
+      "strength": 2.0,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.45061975209916033,
+      "macro_f1": 0.43533197524651335
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "strong",
+      "strength": 2.0,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.45111955217912836,
+      "macro_f1": 0.43327407861398914
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "gaussian_blur",
+      "severity": "strong",
+      "strength": 2.0,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.4516193522590964,
+      "macro_f1": 0.4338484403143379,
+      "agreement_rate": 0.7397041183526589,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "light",
+      "strength": 0.03,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.8219712115153939,
+      "macro_f1": 0.8146938720687812
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "light",
+      "strength": 0.03,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.8651539384246302,
+      "macro_f1": 0.8657825399212713
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "light",
+      "strength": 0.03,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.8726509396241503,
+      "macro_f1": 0.8727126067186677
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "light",
+      "strength": 0.03,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.8725509796081568,
+      "macro_f1": 0.8726137345537471,
+      "agreement_rate": 0.9071371451419432,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "medium",
+      "strength": 0.07,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.540483806477409,
+      "macro_f1": 0.5057569439294348
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "medium",
+      "strength": 0.07,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.7881847261095561,
+      "macro_f1": 0.7877936546154799
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "medium",
+      "strength": 0.07,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.8001799280287885,
+      "macro_f1": 0.7993223098703275
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "medium",
+      "strength": 0.07,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.8002798880447821,
+      "macro_f1": 0.7993468261366616,
+      "agreement_rate": 0.8715513794482207,
+      "updated_batches": 157,
+      "total_batches": 157
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "strong",
+      "strength": 0.15,
+      "method": "source_only",
+      "samples": 10004,
+      "accuracy": 0.27279088364654136,
+      "macro_f1": 0.19363240876403923
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "strong",
+      "strength": 0.15,
+      "method": "bn_only",
+      "samples": 10004,
+      "accuracy": 0.618452618952419,
+      "macro_f1": 0.6083246511746175
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "strong",
+      "strength": 0.15,
+      "method": "tent",
+      "samples": 10004,
+      "accuracy": 0.6298480607756898,
+      "macro_f1": 0.6169650448252018
+    },
+    {
+      "model": "balanced",
+      "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+      "corruption": "hue_shift",
+      "severity": "strong",
+      "strength": 0.15,
+      "method": "cafa_v3",
+      "samples": 10004,
+      "accuracy": 0.6307477009196322,
+      "macro_f1": 0.617804958827976,
+      "agreement_rate": 0.804578168732507,
+      "updated_batches": 157,
+      "total_batches": 157
+    }
+  ],
+  "summary": {
+    "enhanced": {
+      "gaussian_noise": {
+        "light": {
+          "methods": {
+            "source_only": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "light",
+              "strength": 0.02,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.931827269092363,
+              "macro_f1": 0.9310051204389329
+            },
+            "bn_only": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "light",
+              "strength": 0.02,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.9159336265493803,
+              "macro_f1": 0.91652284506289
+            },
+            "tent": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "light",
+              "strength": 0.02,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.9184326269492203,
+              "macro_f1": 0.9188040564794279
+            },
+            "cafa_v3": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "light",
+              "strength": 0.02,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.9189324270291883,
+              "macro_f1": 0.9192685403958597,
+              "agreement_rate": 0.9365253898440624,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": 0.04998000799679714,
+          "cafa_vs_tent_macro_f1_pp": 0.046448391643183484,
+          "cafa_vs_bn_only_pp": 0.29988004798080503,
+          "cafa_vs_source_only_pp": -1.2894842063174705
+        },
+        "medium": {
+          "methods": {
+            "source_only": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "medium",
+              "strength": 0.05,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.5815673730507797,
+              "macro_f1": 0.5642567889838314
+            },
+            "bn_only": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "medium",
+              "strength": 0.05,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.8486605357856857,
+              "macro_f1": 0.8511358623966789
+            },
+            "tent": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "medium",
+              "strength": 0.05,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.8533586565373851,
+              "macro_f1": 0.8553985664952383
+            },
+            "cafa_v3": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "medium",
+              "strength": 0.05,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.8540583766493403,
+              "macro_f1": 0.8560655197222347,
+              "agreement_rate": 0.9081367453018793,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": 0.06997201119551821,
+          "cafa_vs_tent_macro_f1_pp": 0.06669532269963918,
+          "cafa_vs_bn_only_pp": 0.5397840863654579,
+          "cafa_vs_source_only_pp": 27.249100359856058
+        },
+        "strong": {
+          "methods": {
+            "source_only": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "strong",
+              "strength": 0.1,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.21021591363454617,
+              "macro_f1": 0.13816298509324676
+            },
+            "bn_only": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "strong",
+              "strength": 0.1,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.6931227508996401,
+              "macro_f1": 0.6945902907321957
+            },
+            "tent": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "strong",
+              "strength": 0.1,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.6985205917632947,
+              "macro_f1": 0.6989629005124288
+            },
+            "cafa_v3": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "strong",
+              "strength": 0.1,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.6987205117952819,
+              "macro_f1": 0.6990943395266492,
+              "agreement_rate": 0.8547580967612954,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": 0.019992003198721076,
+          "cafa_vs_tent_macro_f1_pp": 0.01314390142204136,
+          "cafa_vs_bn_only_pp": 0.559776089564179,
+          "cafa_vs_source_only_pp": 48.850459816073574
+        }
+      },
+      "gaussian_blur": {
+        "light": {
+          "methods": {
+            "source_only": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "light",
+              "strength": 0.5,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.8540583766493403,
+              "macro_f1": 0.854473302565134
+            },
+            "bn_only": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "light",
+              "strength": 0.5,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.9178328668532587,
+              "macro_f1": 0.9181949738801932
+            },
+            "tent": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "light",
+              "strength": 0.5,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.9221311475409836,
+              "macro_f1": 0.9223288477149981
+            },
+            "cafa_v3": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "light",
+              "strength": 0.5,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.922530987604958,
+              "macro_f1": 0.9226742301946886,
+              "agreement_rate": 0.9434226309476209,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": 0.03998400639744215,
+          "cafa_vs_tent_macro_f1_pp": 0.03453824796905147,
+          "cafa_vs_bn_only_pp": 0.4698120751699286,
+          "cafa_vs_source_only_pp": 6.847261095561774
+        },
+        "medium": {
+          "methods": {
+            "source_only": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "medium",
+              "strength": 1.0,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.4728108756497401,
+              "macro_f1": 0.407040318647363
+            },
+            "bn_only": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "medium",
+              "strength": 1.0,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.7883846461415434,
+              "macro_f1": 0.7899373701472545
+            },
+            "tent": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "medium",
+              "strength": 1.0,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.806077568972411,
+              "macro_f1": 0.8075593941673538
+            },
+            "cafa_v3": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "medium",
+              "strength": 1.0,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.8070771691323471,
+              "macro_f1": 0.808494653232221,
+              "agreement_rate": 0.8786485405837665,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": 0.09996001599360538,
+          "cafa_vs_tent_macro_f1_pp": 0.09352590648672443,
+          "cafa_vs_bn_only_pp": 1.8692522990803706,
+          "cafa_vs_source_only_pp": 33.4266293482607
+        },
+        "strong": {
+          "methods": {
+            "source_only": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "strong",
+              "strength": 2.0,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.3142742902838864,
+              "macro_f1": 0.2196485948987329
+            },
+            "bn_only": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "strong",
+              "strength": 2.0,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.5459816073570571,
+              "macro_f1": 0.5418313873613214
+            },
+            "tent": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "strong",
+              "strength": 2.0,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.5512794882047181,
+              "macro_f1": 0.5463535481650111
+            },
+            "cafa_v3": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "strong",
+              "strength": 2.0,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.5515793682526989,
+              "macro_f1": 0.5468185377101754,
+              "agreement_rate": 0.7674930027988804,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": 0.029988004798087164,
+          "cafa_vs_tent_macro_f1_pp": 0.04649895451642738,
+          "cafa_vs_bn_only_pp": 0.559776089564179,
+          "cafa_vs_source_only_pp": 23.730507796881252
+        }
+      },
+      "hue_shift": {
+        "light": {
+          "methods": {
+            "source_only": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "light",
+              "strength": 0.03,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.35805677728908436,
+              "macro_f1": 0.329598877216719
+            },
+            "bn_only": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "light",
+              "strength": 0.03,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.8499600159936026,
+              "macro_f1": 0.8491037493965534
+            },
+            "tent": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "light",
+              "strength": 0.03,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.8597560975609756,
+              "macro_f1": 0.8588963108255735
+            },
+            "cafa_v3": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "light",
+              "strength": 0.03,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.8604558176729308,
+              "macro_f1": 0.859600778458156,
+              "agreement_rate": 0.895641743302679,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": 0.06997201119551821,
+          "cafa_vs_tent_macro_f1_pp": 0.07044676325824728,
+          "cafa_vs_bn_only_pp": 1.0495801679328176,
+          "cafa_vs_source_only_pp": 50.239904038384644
+        },
+        "medium": {
+          "methods": {
+            "source_only": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "medium",
+              "strength": 0.07,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.20851659336265493,
+              "macro_f1": 0.1115636061087879
+            },
+            "bn_only": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "medium",
+              "strength": 0.07,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.6636345461815274,
+              "macro_f1": 0.6577796187477253
+            },
+            "tent": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "medium",
+              "strength": 0.07,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.6748300679728109,
+              "macro_f1": 0.6695402573788439
+            },
+            "cafa_v3": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "medium",
+              "strength": 0.07,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.6765293882447021,
+              "macro_f1": 0.6710921939157205,
+              "agreement_rate": 0.7934826069572171,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": 0.1699320271891236,
+          "cafa_vs_tent_macro_f1_pp": 0.15519365368765747,
+          "cafa_vs_bn_only_pp": 1.2894842063174705,
+          "cafa_vs_source_only_pp": 46.80127948820471
+        },
+        "strong": {
+          "methods": {
+            "source_only": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "strong",
+              "strength": 0.15,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.21051579368252699,
+              "macro_f1": 0.10759554899071869
+            },
+            "bn_only": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "strong",
+              "strength": 0.15,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.43932427029188326,
+              "macro_f1": 0.432554660508652
+            },
+            "tent": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "strong",
+              "strength": 0.15,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.44432227109156336,
+              "macro_f1": 0.4368430993775276
+            },
+            "cafa_v3": {
+              "model": "enhanced",
+              "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "strong",
+              "strength": 0.15,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.44422231107556975,
+              "macro_f1": 0.4368462895411587,
+              "agreement_rate": 0.7902838864454218,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": -0.009996001599360538,
+          "cafa_vs_tent_macro_f1_pp": 0.00031901636311504333,
+          "cafa_vs_bn_only_pp": 0.4898040783686497,
+          "cafa_vs_source_only_pp": 23.370651739304275
+        }
+      }
+    },
+    "robust": {
+      "gaussian_noise": {
+        "light": {
+          "methods": {
+            "source_only": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "light",
+              "strength": 0.02,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.8660535785685726,
+              "macro_f1": 0.8676754074267594
+            },
+            "bn_only": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "light",
+              "strength": 0.02,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.8286685325869653,
+              "macro_f1": 0.8282476640346901
+            },
+            "tent": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "light",
+              "strength": 0.02,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.8433626549380248,
+              "macro_f1": 0.8434937705552631
+            },
+            "cafa_v3": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "light",
+              "strength": 0.02,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.8441623350659736,
+              "macro_f1": 0.8442454127478634,
+              "agreement_rate": 0.8867453018792483,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": 0.0799680127948843,
+          "cafa_vs_tent_macro_f1_pp": 0.07516421926002659,
+          "cafa_vs_bn_only_pp": 1.5493802479008334,
+          "cafa_vs_source_only_pp": -2.1891243502598967
+        },
+        "medium": {
+          "methods": {
+            "source_only": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "medium",
+              "strength": 0.05,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.5480807676929228,
+              "macro_f1": 0.531180116139597
+            },
+            "bn_only": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "medium",
+              "strength": 0.05,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.7444022391043582,
+              "macro_f1": 0.7385679207479533
+            },
+            "tent": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "medium",
+              "strength": 0.05,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.7472011195521792,
+              "macro_f1": 0.7407309269755441
+            },
+            "cafa_v3": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "medium",
+              "strength": 0.05,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.7478008796481408,
+              "macro_f1": 0.7414860226950921,
+              "agreement_rate": 0.8454618152738904,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": 0.05997600959616323,
+          "cafa_vs_tent_macro_f1_pp": 0.07550957195480157,
+          "cafa_vs_bn_only_pp": 0.3398640543782583,
+          "cafa_vs_source_only_pp": 19.972011195521798
+        },
+        "strong": {
+          "methods": {
+            "source_only": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "strong",
+              "strength": 0.1,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.256297481007597,
+              "macro_f1": 0.196377200917078
+            },
+            "bn_only": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "strong",
+              "strength": 0.1,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.6058576569372252,
+              "macro_f1": 0.5997896565721648
+            },
+            "tent": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "strong",
+              "strength": 0.1,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.6132546981207517,
+              "macro_f1": 0.6052661321977726
+            },
+            "cafa_v3": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "strong",
+              "strength": 0.1,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.6145541783286685,
+              "macro_f1": 0.6063697814593633,
+              "agreement_rate": 0.8002798880447821,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": 0.12994802079168144,
+          "cafa_vs_tent_macro_f1_pp": 0.11036492615906779,
+          "cafa_vs_bn_only_pp": 0.869652139144339,
+          "cafa_vs_source_only_pp": 35.82566973210716
+        }
+      },
+      "gaussian_blur": {
+        "light": {
+          "methods": {
+            "source_only": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "light",
+              "strength": 0.5,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.7288084766093562,
+              "macro_f1": 0.7162460345136581
+            },
+            "bn_only": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "light",
+              "strength": 0.5,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.8589564174330268,
+              "macro_f1": 0.859715955956613
+            },
+            "tent": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "light",
+              "strength": 0.5,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.8699520191923231,
+              "macro_f1": 0.8700983443826361
+            },
+            "cafa_v3": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "light",
+              "strength": 0.5,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.8697520991603359,
+              "macro_f1": 0.8697692519030773,
+              "agreement_rate": 0.9030387844862056,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": -0.019992003198721076,
+          "cafa_vs_tent_macro_f1_pp": -0.03290924795588124,
+          "cafa_vs_bn_only_pp": 1.0795681727309159,
+          "cafa_vs_source_only_pp": 14.09436225509797
+        },
+        "medium": {
+          "methods": {
+            "source_only": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "medium",
+              "strength": 1.0,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.31457417033186724,
+              "macro_f1": 0.25425795238812937
+            },
+            "bn_only": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "medium",
+              "strength": 1.0,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.6655337864854058,
+              "macro_f1": 0.6402411855270275
+            },
+            "tent": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "medium",
+              "strength": 1.0,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.6814274290283886,
+              "macro_f1": 0.6549236110276492
+            },
+            "cafa_v3": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "medium",
+              "strength": 1.0,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.6815273890443823,
+              "macro_f1": 0.6550279611772457,
+              "agreement_rate": 0.8168732506997202,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": 0.009996001599366089,
+          "cafa_vs_tent_macro_f1_pp": 0.010435014959653266,
+          "cafa_vs_bn_only_pp": 1.5993602558976416,
+          "cafa_vs_source_only_pp": 36.6953218712515
+        },
+        "strong": {
+          "methods": {
+            "source_only": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "strong",
+              "strength": 2.0,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.17113154738104758,
+              "macro_f1": 0.12013505648449106
+            },
+            "bn_only": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "strong",
+              "strength": 2.0,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.46291483406637346,
+              "macro_f1": 0.44561707886310525
+            },
+            "tent": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "strong",
+              "strength": 2.0,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.4635145941623351,
+              "macro_f1": 0.4429942085958889
+            },
+            "cafa_v3": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "strong",
+              "strength": 2.0,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.46361455417832864,
+              "macro_f1": 0.4430937638105382,
+              "agreement_rate": 0.7674930027988804,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": 0.009996001599354987,
+          "cafa_vs_tent_macro_f1_pp": 0.009955521464932726,
+          "cafa_vs_bn_only_pp": 0.06997201119551821,
+          "cafa_vs_source_only_pp": 29.248300679728107
+        }
+      },
+      "hue_shift": {
+        "light": {
+          "methods": {
+            "source_only": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "hue_shift",
+              "severity": "light",
+              "strength": 0.03,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.8695521791283487,
+              "macro_f1": 0.8716336012233022
+            },
+            "bn_only": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "hue_shift",
+              "severity": "light",
+              "strength": 0.03,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.8348660535785686,
+              "macro_f1": 0.8353467912365811
+            },
+            "tent": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "hue_shift",
+              "severity": "light",
+              "strength": 0.03,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.8446621351459416,
+              "macro_f1": 0.844696033585917
+            },
+            "cafa_v3": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "hue_shift",
+              "severity": "light",
+              "strength": 0.03,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.8442622950819673,
+              "macro_f1": 0.844137799190189,
+              "agreement_rate": 0.8887445021991204,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": -0.03998400639743105,
+          "cafa_vs_tent_macro_f1_pp": -0.05582343957279967,
+          "cafa_vs_bn_only_pp": 0.9396241503398683,
+          "cafa_vs_source_only_pp": -2.528988404638144
+        },
+        "medium": {
+          "methods": {
+            "source_only": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "hue_shift",
+              "severity": "medium",
+              "strength": 0.07,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.7614954018392643,
+              "macro_f1": 0.753790242820153
+            },
+            "bn_only": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "hue_shift",
+              "severity": "medium",
+              "strength": 0.07,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.7755897640943623,
+              "macro_f1": 0.7743613005164675
+            },
+            "tent": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "hue_shift",
+              "severity": "medium",
+              "strength": 0.07,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.7873850459816074,
+              "macro_f1": 0.7858602842212431
+            },
+            "cafa_v3": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "hue_shift",
+              "severity": "medium",
+              "strength": 0.07,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.7882846861255498,
+              "macro_f1": 0.7866145380926425,
+              "agreement_rate": 0.8605557776889244,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": 0.08996401439423929,
+          "cafa_vs_tent_macro_f1_pp": 0.07542538713993796,
+          "cafa_vs_bn_only_pp": 1.2694922031187494,
+          "cafa_vs_source_only_pp": 2.6789284286285464
+        },
+        "strong": {
+          "methods": {
+            "source_only": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "hue_shift",
+              "severity": "strong",
+              "strength": 0.15,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.44842063174730107,
+              "macro_f1": 0.42410914082598544
+            },
+            "bn_only": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "hue_shift",
+              "severity": "strong",
+              "strength": 0.15,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.6628348660535786,
+              "macro_f1": 0.6556793929084967
+            },
+            "tent": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "hue_shift",
+              "severity": "strong",
+              "strength": 0.15,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.6746301479408237,
+              "macro_f1": 0.6671712214098271
+            },
+            "cafa_v3": {
+              "model": "robust",
+              "checkpoint": "resnet18_pathmnist_robust_best.pt",
+              "corruption": "hue_shift",
+              "severity": "strong",
+              "strength": 0.15,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.6759296281487405,
+              "macro_f1": 0.6684171515859283,
+              "agreement_rate": 0.818172730907637,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": 0.12994802079168144,
+          "cafa_vs_tent_macro_f1_pp": 0.12459301761011954,
+          "cafa_vs_bn_only_pp": 1.3094762095161916,
+          "cafa_vs_source_only_pp": 22.750899640143942
+        }
+      }
+    },
+    "balanced": {
+      "gaussian_noise": {
+        "light": {
+          "methods": {
+            "source_only": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "light",
+              "strength": 0.02,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.9035385845661735,
+              "macro_f1": 0.9024991814823152
+            },
+            "bn_only": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "light",
+              "strength": 0.02,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.8789484206317473,
+              "macro_f1": 0.880184493290139
+            },
+            "tent": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "light",
+              "strength": 0.02,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.8880447820871651,
+              "macro_f1": 0.8888129868978445
+            },
+            "cafa_v3": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "light",
+              "strength": 0.02,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.8879448220711715,
+              "macro_f1": 0.8886947456961583,
+              "agreement_rate": 0.9193322670931627,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": -0.009996001599354987,
+          "cafa_vs_tent_macro_f1_pp": -0.01182412016862422,
+          "cafa_vs_bn_only_pp": 0.8996401439424262,
+          "cafa_vs_source_only_pp": -1.5593762495001995
+        },
+        "medium": {
+          "methods": {
+            "source_only": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "medium",
+              "strength": 0.05,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.5332866853258696,
+              "macro_f1": 0.511795954760446
+            },
+            "bn_only": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "medium",
+              "strength": 0.05,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.799780087964814,
+              "macro_f1": 0.8022241591854699
+            },
+            "tent": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "medium",
+              "strength": 0.05,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.8113754498200719,
+              "macro_f1": 0.8138635106226213
+            },
+            "cafa_v3": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "medium",
+              "strength": 0.05,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.8116753298680528,
+              "macro_f1": 0.814104500983877,
+              "agreement_rate": 0.8901439424230307,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": 0.029988004798087164,
+          "cafa_vs_tent_macro_f1_pp": 0.02409903612556885,
+          "cafa_vs_bn_only_pp": 1.1895241903238762,
+          "cafa_vs_source_only_pp": 27.838864454218314
+        },
+        "strong": {
+          "methods": {
+            "source_only": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "strong",
+              "strength": 0.1,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.20511795281887246,
+              "macro_f1": 0.13920244950044536
+            },
+            "bn_only": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "strong",
+              "strength": 0.1,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.6457417033186725,
+              "macro_f1": 0.6479875589716476
+            },
+            "tent": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "strong",
+              "strength": 0.1,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.6540383846461415,
+              "macro_f1": 0.6548914145249165
+            },
+            "cafa_v3": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_noise",
+              "severity": "strong",
+              "strength": 0.1,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.654938024790084,
+              "macro_f1": 0.6557377303245354,
+              "agreement_rate": 0.8189724110355857,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": 0.08996401439425039,
+          "cafa_vs_tent_macro_f1_pp": 0.0846315799618913,
+          "cafa_vs_bn_only_pp": 0.9196321471411473,
+          "cafa_vs_source_only_pp": 44.982007197121156
+        }
+      },
+      "gaussian_blur": {
+        "light": {
+          "methods": {
+            "source_only": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "light",
+              "strength": 0.5,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.760795681727309,
+              "macro_f1": 0.75891581033339
+            },
+            "bn_only": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "light",
+              "strength": 0.5,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.8947421031587365,
+              "macro_f1": 0.8954961937858208
+            },
+            "tent": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "light",
+              "strength": 0.5,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.8984406237504998,
+              "macro_f1": 0.8988587581788864
+            },
+            "cafa_v3": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "light",
+              "strength": 0.5,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.898640543782487,
+              "macro_f1": 0.8990374989190355,
+              "agreement_rate": 0.922530987604958,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": 0.019992003198721076,
+          "cafa_vs_tent_macro_f1_pp": 0.017874074014911923,
+          "cafa_vs_bn_only_pp": 0.3898440623750554,
+          "cafa_vs_source_only_pp": 13.784486205517798
+        },
+        "medium": {
+          "methods": {
+            "source_only": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "medium",
+              "strength": 1.0,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.35005997600959615,
+              "macro_f1": 0.29507313117478134
+            },
+            "bn_only": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "medium",
+              "strength": 1.0,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.6830267892842863,
+              "macro_f1": 0.6572435427208855
+            },
+            "tent": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "medium",
+              "strength": 1.0,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.6990203918432627,
+              "macro_f1": 0.670330801715437
+            },
+            "cafa_v3": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "medium",
+              "strength": 1.0,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.6995201919232307,
+              "macro_f1": 0.670806359998878,
+              "agreement_rate": 0.8024790083966413,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": 0.04998000799679714,
+          "cafa_vs_tent_macro_f1_pp": 0.047555828344103546,
+          "cafa_vs_bn_only_pp": 1.6493402638944388,
+          "cafa_vs_source_only_pp": 34.946021591363454
+        },
+        "strong": {
+          "methods": {
+            "source_only": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "strong",
+              "strength": 2.0,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.2614954018392643,
+              "macro_f1": 0.19389660720984614
+            },
+            "bn_only": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "strong",
+              "strength": 2.0,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.45061975209916033,
+              "macro_f1": 0.43533197524651335
+            },
+            "tent": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "strong",
+              "strength": 2.0,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.45111955217912836,
+              "macro_f1": 0.43327407861398914
+            },
+            "cafa_v3": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "gaussian_blur",
+              "severity": "strong",
+              "strength": 2.0,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.4516193522590964,
+              "macro_f1": 0.4338484403143379,
+              "agreement_rate": 0.7397041183526589,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": 0.04998000799680269,
+          "cafa_vs_tent_macro_f1_pp": 0.05743617003487467,
+          "cafa_vs_bn_only_pp": 0.09996001599360538,
+          "cafa_vs_source_only_pp": 19.01239504198321
+        }
+      },
+      "hue_shift": {
+        "light": {
+          "methods": {
+            "source_only": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "light",
+              "strength": 0.03,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.8219712115153939,
+              "macro_f1": 0.8146938720687812
+            },
+            "bn_only": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "light",
+              "strength": 0.03,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.8651539384246302,
+              "macro_f1": 0.8657825399212713
+            },
+            "tent": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "light",
+              "strength": 0.03,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.8726509396241503,
+              "macro_f1": 0.8727126067186677
+            },
+            "cafa_v3": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "light",
+              "strength": 0.03,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.8725509796081568,
+              "macro_f1": 0.8726137345537471,
+              "agreement_rate": 0.9071371451419432,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": -0.009996001599354987,
+          "cafa_vs_tent_macro_f1_pp": -0.009887216492054929,
+          "cafa_vs_bn_only_pp": 0.7397041183526576,
+          "cafa_vs_source_only_pp": 5.057976809276288
+        },
+        "medium": {
+          "methods": {
+            "source_only": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "medium",
+              "strength": 0.07,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.540483806477409,
+              "macro_f1": 0.5057569439294348
+            },
+            "bn_only": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "medium",
+              "strength": 0.07,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.7881847261095561,
+              "macro_f1": 0.7877936546154799
+            },
+            "tent": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "medium",
+              "strength": 0.07,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.8001799280287885,
+              "macro_f1": 0.7993223098703275
+            },
+            "cafa_v3": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "medium",
+              "strength": 0.07,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.8002798880447821,
+              "macro_f1": 0.7993468261366616,
+              "agreement_rate": 0.8715513794482207,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": 0.009996001599366089,
+          "cafa_vs_tent_macro_f1_pp": 0.002451626633415138,
+          "cafa_vs_bn_only_pp": 1.2095161935225973,
+          "cafa_vs_source_only_pp": 25.97960815673731
+        },
+        "strong": {
+          "methods": {
+            "source_only": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "strong",
+              "strength": 0.15,
+              "method": "source_only",
+              "samples": 10004,
+              "accuracy": 0.27279088364654136,
+              "macro_f1": 0.19363240876403923
+            },
+            "bn_only": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "strong",
+              "strength": 0.15,
+              "method": "bn_only",
+              "samples": 10004,
+              "accuracy": 0.618452618952419,
+              "macro_f1": 0.6083246511746175
+            },
+            "tent": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "strong",
+              "strength": 0.15,
+              "method": "tent",
+              "samples": 10004,
+              "accuracy": 0.6298480607756898,
+              "macro_f1": 0.6169650448252018
+            },
+            "cafa_v3": {
+              "model": "balanced",
+              "checkpoint": "resnet18_pathmnist_balanced_best.pt",
+              "corruption": "hue_shift",
+              "severity": "strong",
+              "strength": 0.15,
+              "method": "cafa_v3",
+              "samples": 10004,
+              "accuracy": 0.6307477009196322,
+              "macro_f1": 0.617804958827976,
+              "agreement_rate": 0.804578168732507,
+              "updated_batches": 157,
+              "total_batches": 157
+            }
+          },
+          "cafa_vs_tent_pp": 0.08996401439423929,
+          "cafa_vs_tent_macro_f1_pp": 0.0839914002774278,
+          "cafa_vs_bn_only_pp": 1.2295081967213184,
+          "cafa_vs_source_only_pp": 35.79568172730908
+        }
+      }
+    }
+  },
+  "corruption_summary": {
+    "gaussian_noise": {
+      "mean_accuracy_delta_pp": 0.05775467590741644,
+      "mean_macro_f1_delta_pp": 0.05380364767306621,
+      "accuracy_wins": 8,
+      "accuracy_ties": 0,
+      "accuracy_losses": 1
+    },
+    "gaussian_blur": {
+      "mean_accuracy_delta_pp": 0.0322093384868284,
+      "mean_macro_f1_delta_pp": 0.03165671887053313,
+      "accuracy_wins": 8,
+      "accuracy_ties": 0,
+      "accuracy_losses": 1
+    },
+    "hue_shift": {
+      "mean_accuracy_delta_pp": 0.05553334221866904,
+      "mean_macro_f1_delta_pp": 0.049634467656118404,
+      "accuracy_wins": 6,
+      "accuracy_ties": 0,
+      "accuracy_losses": 3
+    }
+  },
+  "overall": {
+    "mean_accuracy_delta_pp": 0.048499118870971296,
+    "mean_macro_f1_delta_pp": 0.04503161139990591,
+    "accuracy_wins": 22,
+    "accuracy_ties": 0,
+    "accuracy_losses": 5,
+    "total_comparisons": 27
+  }
+}

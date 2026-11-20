@@ -1,0 +1,18 @@
+{
+  "checkpoint": "resnet18_pathmnist_enhanced_best.pt",
+  "checkpoint_epoch": 13,
+  "split": "val",
+  "shift": {
+    "brightness": 0.75,
+    "contrast": 1.35,
+    "saturation": 0.7
+  },
+  "original": {
+    "accuracy": 0.9540183926429429,
+    "macro_f1": 0.9538908027951933
+  },
+  "shifted": {
+    "accuracy": 0.16303478608556576,
+    "macro_f1": 0.0718549610586378
+  }
+}

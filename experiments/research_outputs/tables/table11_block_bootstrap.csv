@@ -1,0 +1,5 @@
+﻿block_length_batches,paired_comparisons,positive_intervals,negative_intervals,intervals_including_zero,mean_interval_width_pp
+1,117,43,2,72,0.16176640500526163
+4,117,43,2,72,0.15920766588838284
+8,117,43,2,72,0.15564385344311824
+16,117,47,2,68,0.14937167715915378

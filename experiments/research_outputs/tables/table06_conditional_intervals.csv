@@ -1,0 +1,4 @@
+﻿group,accuracy_delta_pp,conditional_ci_lower_pp,conditional_ci_upper_pp,interval_type
+Overall,0.06213841868437969,0.05392174368497489,0.07047115682213174,Common-image conditional bootstrap
+Color severity,0.05532342927886103,0.04139585267718973,0.06925100588053233,Common-image conditional bootstrap
+Corruptions,0.0651673028646102,0.055194470236252964,0.07531208088311153,Common-image conditional bootstrap

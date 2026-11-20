@@ -1,0 +1,17 @@
+# CAFA-TTA research artifact preservation
+# Preserve original file bytes across Git platforms.
+# Required for frozen SHA-256 integrity verification.
+
+* -text
+
+# Binary research artifacts
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.pdf binary
+*.npz binary
+*.npy binary
+*.pt binary
+*.pth binary
+*.ckpt binary
+*.zip binary

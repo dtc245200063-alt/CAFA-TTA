@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: If you use this software in your research, please cite it using the metadata below.
+title: 'CAFA-TTA: Confidence-Aware Feature Alignment for Test-Time Adaptation in Cross-Domain Medical
+  Image Classification'
+type: software
+authors:
+- family-names: Lương
+  given-names: Việt Anh
+repository-code: https://github.com/dtc245200063-alt/CAFA-TTA
+license: MIT
+abstract: An experimental framework combining confidence-weighted entropy minimization and source-prototype
+  feature alignment for unsupervised test-time adaptation in medical image classification. The framework
+  is evaluated on PathMNIST and a selected external STARC-9 subset.
+keywords:
+- test-time adaptation
+- medical image classification
+- domain shift
+- histopathology
+- confidence weighting
+- feature alignment
+- source prototypes
+- PathMNIST
+- STARC-9
+- deep learning

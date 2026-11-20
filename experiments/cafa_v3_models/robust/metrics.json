@@ -1,0 +1,31 @@
+{
+  "method": "CAFA-TTA-v3-Soft",
+  "model": "robust",
+  "checkpoint": "resnet18_pathmnist_robust_best.pt",
+  "prototype_file": "source_prototypes_robust.pt",
+  "prototype_mode": "source_eval",
+  "protocol": "online_prequential",
+  "split": "val",
+  "seed": 42,
+  "shuffle": false,
+  "shift": {
+    "brightness": 0.75,
+    "contrast": 1.35,
+    "saturation": 0.7
+  },
+  "batch_size": 64,
+  "learning_rate": 0.0001,
+  "entropy_floor": 0.2,
+  "lambda_align": 0.05,
+  "min_samples": 2,
+  "accuracy": 0.8162734906037585,
+  "macro_f1": 0.8153592070118341,
+  "selection_rate": 0.8847461015593763,
+  "selected_samples": 8851,
+  "total_samples": 10004,
+  "updated_batches": 157,
+  "total_batches": 157,
+  "mean_entropy_loss": 0.16629374349952503,
+  "mean_alignment_loss": 0.34148642629574816,
+  "mean_total_loss": 0.1833680651749775
+}

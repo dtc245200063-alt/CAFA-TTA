@@ -1,0 +1,3 @@
+﻿group,test_images,macro_recall_delta_pp,macro_f1_delta_pp,weighted_recall_delta_pp,corrected_events,harmed_events,net_correct_events
+minority,2727,-0.0020430614150639707,0.02685202388311183,0.004701324833337979,179,164,15
+majority,4453,0.09884176976243009,0.06726707076654394,0.09731267310427395,633,126,507

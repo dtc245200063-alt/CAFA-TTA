@@ -1,318 +1,992 @@
-\# CAFA-TTA: Confidence-Aware Feature Alignment for Test-Time Adaptation
 
+# CAFA-TTA
 
+### Confidence-Aware Feature Alignment for Test-Time Adaptation in Cross-Domain Medical Image Classification
 
-A research prototype for test-time adaptation in medical image classification under simulated domain shift.
+![Python](https://img.shields.io/badge/Python-3.12-blue)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.10-EE4C2C)
+![CUDA](https://img.shields.io/badge/CUDA-12.8-76B900)
+![Research](https://img.shields.io/badge/Status-Research_Prototype-blue)
+![Dataset](https://img.shields.io/badge/Datasets-PathMNIST_%7C_STARC--9-orange)
+![Method](https://img.shields.io/badge/Method-CAFA--TTA_v3-purple)
 
+An experimental framework for confidence-aware entropy minimization and source-prototype feature alignment in unsupervised test-time adaptation for medical image classification.
 
+---
 
-\## Overview
+## Overview
 
+Medical image classification models may experience performance degradation when deployed on data distributions that differ from their training distributions.
 
+Test-time adaptation (TTA) attempts to reduce this degradation by adapting pretrained models using unlabeled target samples.
 
-CAFA-TTA explores whether confidence-aware sample selection and source-prototype feature alignment can improve test-time adaptation beyond entropy minimization.
+CAFA-TTA investigates whether confidence-aware feature alignment can provide additional improvements beyond conventional test-time entropy minimization (TENT).
 
+The final proposed method, **CAFA-TTA v3**, combines:
 
+- Confidence-weighted entropy minimization.
+- Source class prototypes.
+- Classifier-prototype agreement.
+- Confidence-aware feature alignment.
+- Batch-normalization affine parameter adaptation.
+- Online batch-prequential evaluation.
 
-The prototype is evaluated on \*\*PathMNIST\*\*, a nine-class histopathology image classification dataset. Domain shift is simulated using brightness, contrast, and saturation transformations.
+The framework is evaluated on PathMNIST and an external six-category subset of STARC-9.
 
+**Research status:** Experimental research prototype. The method has not been clinically validated or independently replicated.
 
+---
 
-\*\*Research status:\*\* Proof of concept. The experiments do not establish performance on real cross-hospital domain shifts.
+## Research Highlights
 
+| Research Component | Scope |
+|---|---:|
+| Evaluation datasets | 2 |
+| Trained ResNet-18 checkpoints | 4 |
+| Final source model variants | 3 |
+| Adaptation seeds | 3 |
+| PathMNIST evaluation conditions | 13 |
+| Final prediction files | 453 |
+| Paired CAFA v3 vs TENT comparisons | 126 |
+| Factorial ablation runs | 36 |
+| Computational benchmark runs | 36 |
+| Research figures | 22 |
+| Selected research CSV tables | 28 |
 
+All 453 original final prediction files passed local integrity and structural content verification.
 
-\## Methods
+The paired comparisons reuse underlying evaluation samples and should not be interpreted as statistically independent experiments.
 
+---
 
+## Table of Contents
 
-Four principal methods are evaluated:
+- [Motivation](#motivation)
+- [Methodology](#methodology)
+- [Experimental Setup](#experimental-setup)
+- [Main Results](#main-results)
+- [External Evaluation](#external-evaluation)
+- [Ablation Study](#ablation-study)
+- [Statistical Analysis](#statistical-analysis)
+- [Computational Efficiency](#computational-efficiency)
+- [Negative Adaptation](#negative-adaptation)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Repository Structure](#repository-structure)
+- [Reproducibility](#reproducibility)
+- [Documentation](#documentation)
+- [Limitations](#limitations)
+- [Future Work](#future-work)
+- [Citation](#citation)
+- [License](#license)
 
+---
 
+## Motivation
 
-\- \*\*Source-only:\*\* Frozen ResNet-18 using source-domain BatchNorm statistics.
+Entropy minimization is a practical approach to unsupervised test-time adaptation.
 
-\- \*\*BN-only:\*\* Frozen ResNet-18 using target-batch BatchNorm statistics.
+However, minimizing prediction entropy alone may reinforce incorrect predictions under distribution shift.
 
-\- \*\*TENT:\*\* Test-time entropy minimization with updates to BatchNorm affine parameters.
+Hard confidence filtering may also discard informative target samples.
 
-\- \*\*CAFA-TTA v2:\*\* Entropy minimization combined with confidence filtering, classifier–prototype agreement, and source-prototype feature alignment.
+CAFA-TTA explores two complementary mechanisms:
 
+1. Soft confidence weighting for the entropy objective.
+2. Confidence-aware alignment with source prototypes when classifier and prototype predictions agree.
 
+The central research question is whether these mechanisms provide consistent incremental improvements over TENT while retaining a practical computational footprint.
 
-CAFA-TTA v2 selects target samples when their prediction confidence meets a threshold and the classifier prediction agrees with the nearest source prototype.
+---
 
+## Methodology
 
+### Method Evolution
 
-Target labels are not used for test-time parameter updates.
-
-
-
-\## Experimental Setup
-
-
-
-| Setting | Value |
-
+| Version | Main Mechanism |
 |---|---|
+| CAFA v1 | Confidence-aware feature alignment |
+| CAFA v2 | Confidence filtering and classifier-prototype agreement |
+| CAFA v3 | Soft entropy weighting and agreement-gated feature alignment |
 
-| Dataset | PathMNIST |
+CAFA-TTA v3 is the final proposed method.
 
+Earlier versions are preserved for comparison and research transparency.
+
+### Adaptation Pipeline
+
+```mermaid
+flowchart TD
+    A[Unlabeled Target Batch] --> B[ResNet-18 Classifier]
+    B --> C[Prediction Before Update]
+    B --> D[Feature Representation]
+    B --> E[Normalized Prediction Entropy]
+    E --> F[Confidence Estimation]
+    D --> G[Nearest Source Prototype]
+    P[Source Class Prototypes] --> G
+    C --> H[Classifier-Prototype Agreement]
+    G --> H
+    F --> I[Confidence-Weighted Entropy]
+    F --> J[Confidence-Weighted Alignment]
+    H --> J
+    D --> J
+    P --> J
+    I --> K[Combined Adaptation Objective]
+    J --> K
+    K --> L[Update BatchNorm Affine Parameters]
+    L --> M[Next Target Batch]
+```
+
+### Confidence Estimation
+
+For a classifier prediction distribution p over K source classes:
+
+    confidence = 1 - H(p) / log(K)
+
+where H denotes prediction entropy.
+
+This confidence score is an entropy-derived heuristic rather than a calibrated probability of prediction correctness.
+
+### Confidence-Weighted Entropy
+
+CAFA-TTA v3 assigns each target sample a nonzero entropy weight:
+
+    w_entropy = alpha + (1 - alpha) * confidence
+
+where alpha is the entropy floor.
+
+The weighted entropy objective is normalized by the sum of the sample weights.
+
+Unlike hard confidence rejection, the nonzero floor allows lower-confidence samples to retain a contribution to the entropy objective.
+
+### Source Prototype Alignment
+
+Source class prototypes are constructed using labeled source training features.
+
+Each prototype is a normalized class-level feature mean.
+
+During adaptation:
+
+1. Extract the target feature representation.
+2. Determine the classifier-predicted class.
+3. Identify the nearest source prototype using cosine similarity.
+4. Check classifier-prototype agreement.
+5. Weight valid alignment samples by confidence.
+
+The alignment objective is skipped when the required minimum number of agreement samples is not satisfied.
+
+### Combined Objective
+
+    L_total = L_weighted_entropy + lambda_align * L_alignment
+
+Only batch-normalization affine parameters are optimized.
+
+Target ground-truth labels are not used in parameter adaptation.
+
+The implementation is provided in:
+
+- [CAFA-TTA v1](core/cafa_adapter.py)
+- [CAFA-TTA v2](core/cafa_agreement_adapter.py)
+- [CAFA-TTA v3](core/cafa_soft_adapter.py)
+- [TENT baseline](kernel/tent.py)
+
+---
+
+## Experimental Setup
+
+### Datasets
+
+| Property | PathMNIST | STARC-9 |
+|---|---|---|
+| Modality | Histopathology | Histopathology |
+| Research role | Source training and evaluation | External evaluation |
+| Evaluation samples | 7,180 | 12,000 |
+| Target categories | 9 | 6 |
+| Model output classes | 9 | 9 |
+| Input size | 28 x 28 RGB | Resized to 28 x 28 RGB |
+| Synthetic corruption | Yes | No |
+
+PathMNIST contains:
+
+- 89,996 source training images.
+- 10,004 validation images.
+- 7,180 test images.
+
+The external STARC-9 evaluation uses six approximately corresponding tissue categories selected from a pinned, stain-normalized Stanford validation archive.
+
+All nine source classifier outputs and source prototypes remain available during external evaluation.
+
+Dataset information and attribution requirements are documented in [Dataset Licenses](docs/DATASET_LICENSES.md).
+
+### Source Models
+
+Three related source model variants are used in the final adaptation experiments.
+
+| Model | Training Strategy | Validation Accuracy |
+|---|---|---:|
+| Enhanced | Augmentation-enhanced fine-tuning | 95.40% |
+| Robust | Strong color augmentation | 89.57% |
+| Balanced | Moderate color augmentation | 93.11% |
+
+The Enhanced model is initialized from the original baseline checkpoint.
+
+The Robust and Balanced models are separately fine-tuned from the Enhanced model.
+
+These models share a training lineage and are not independent training replications.
+
+### Frozen Configuration
+
+| Parameter | Value |
+|---|---|
 | Backbone | ResNet-18 |
+| Feature dimension | 512 |
+| Source classes | 9 |
+| Batch size | 64 |
+| Adaptation learning rate | 0.0001 |
+| Entropy floor | 0.2 |
+| Alignment weight | 0.05 |
+| Minimum agreement samples | 2 |
+| Random seeds | 42, 123, 2026 |
+| Protocol | Online batch-prequential |
 
-| Number of classes | 9 |
+See the [frozen configuration](experiments/reproducibility/final_config.json).
 
-| Image size | 28 × 28 |
+### Evaluation Protocol
 
-| Training images | 89,996 |
+The final evaluation follows a predict-before-update protocol.
 
-| Validation images | 10,004 |
+For each target batch:
 
-| Test images | 7,180 |
+1. Generate predictions.
+2. Record the predictions.
+3. Adapt the model using unlabeled target samples.
+4. Continue to the next batch.
 
-| Batch size | 64 for TTA |
+Target batch statistics may depend on other samples within the current batch.
 
-| TTA learning rate | 0.0001 |
+The protocol is therefore batch-prequential rather than strictly individual-sample causal.
 
-| Confidence threshold | 0.7 |
+The source model and adaptation optimizer are reset between independent evaluation runs.
 
-| Alignment loss weight | 0.05 |
+---
 
-| Shift brightness | 0.75 |
+## Main Results
 
-| Shift contrast | 1.35 |
+### PathMNIST Final Evaluation
 
-| Shift saturation | 0.70 |
+The final PathMNIST analysis includes 117 unique paired TENT versus CAFA-TTA v3 comparisons across three source models, three seeds, and 13 evaluation conditions.
 
+| Metric | CAFA v3 vs TENT |
+|---|---:|
+| Mean accuracy improvement | +0.0621 pp |
+| Mean macro-F1 improvement | +0.0448 pp |
+| Accuracy wins | 95 |
+| Accuracy ties | 11 |
+| Accuracy losses | 11 |
+| Corrected predictions | 812 |
+| Harmed predictions | 290 |
+| Net corrected predictions | 522 |
+| Corrected-to-harmed ratio | 2.80 |
 
+Here, pp denotes percentage points.
 
-The evaluation follows an online \*predict-before-adapt\* protocol: predictions are recorded before updating on the current batch.
+The observed incremental improvement is positive on average but small in absolute magnitude.
 
+![Final PathMNIST evaluation](experiments/research_outputs/figures/fig01_final_test_comparison.png)
 
+### Strong Color Shift
 
-\## Final Test Results
+Mean classification accuracy:
 
+| Method | Enhanced | Robust | Balanced |
+|---|---:|---:|---:|
+| Source-only | 17.84% | 81.63% | 78.22% |
+| BN-only | 70.25% | 78.70% | 77.27% |
+| TENT | 71.03% | 79.97% | 78.52% |
+| CAFA v1 | 71.03% | 79.93% | 78.69% |
+| Alignment variant | 71.07% | 79.97% | 78.56% |
+| CAFA v2 | 71.15% | 79.91% | 78.71% |
+| CAFA v3 | 71.12% | 80.01% | 78.60% |
 
+CAFA v3 does not achieve the highest accuracy for every source model.
 
-| Method | Accuracy | Macro-F1 |
+The Robust source-only classifier outperforms all adaptation methods in this strong color-shift condition.
 
+Most of the Enhanced model recovery is associated with batch normalization and entropy adaptation rather than the incremental CAFA v3 contribution alone.
+
+### Shift Severity
+
+| Color Shift | Mean Accuracy Gain vs TENT |
+|---|---:|
+| Original | +0.032 pp |
+| Light | +0.036 pp |
+| Medium | +0.082 pp |
+| Strong | +0.071 pp |
+
+![Color shift severity](experiments/research_outputs/figures/fig02_shift_severity.png)
+
+### Multiple Corruptions
+
+| Corruption | Paired Comparisons | Mean Accuracy Gain |
 |---|---:|---:|
+| Gaussian noise | 27 | +0.0830 pp |
+| Gaussian blur | 27 | +0.0763 pp |
+| Hue shift | 27 | +0.0361 pp |
 
-| Source-only | 15.01% | 6.51% |
+![Multi-corruption evaluation](experiments/research_outputs/figures/fig03_multi_corruption.png)
 
-| BN-only | 73.93% | 68.11% |
+The improvements are less consistent under hue shift than under Gaussian noise and Gaussian blur.
 
-| TENT | 74.54% ± 0.10 | 68.67% ± 0.14 |
+Repeated strong-shift records are excluded from the final paired aggregation.
 
-| CAFA-TTA v2 | \*\*74.58% ± 0.13\*\* | \*\*68.71% ± 0.17\*\* |
+---
 
+## External Evaluation
 
+### STARC-9
 
-TENT and CAFA-TTA v2 results are reported as mean ± sample standard deviation across three shuffled batch orders (seeds 42, 123, and 2026). Source-only and BN-only were evaluated with one fixed data order.
+A selected external STARC-9 subset is used to evaluate the final frozen CAFA-TTA v3 configuration.
 
+The evaluation contains:
 
+- 12,000 target images.
+- Six target tissue categories.
+- 2,000 samples per category.
+- Nine source classifier outputs.
+- Three related source models.
+- 30 total evaluation runs.
+- Nine paired TENT versus CAFA v3 comparisons.
 
-CAFA-TTA v2 achieved a paired mean accuracy difference of approximately \*\*+0.042 percentage points\*\* against TENT on the final test set.
+No synthetic corruption is applied.
 
+The external protocol is frozen before model evaluation.
 
+Target labels are used for subset selection and metric calculation, not adaptation optimization.
 
-\*\*This difference is too small to establish a robust advantage over TENT.\*\* On validation, CAFA-TTA v2 performed slightly worse on average than TENT.
+### External Accuracy
 
+| Model | Source-only | BN-only | TENT | CAFA v3 |
+|---|---:|---:|---:|---:|
+| Enhanced | 22.3250% | 55.0139% | 56.4472% | 56.5917% |
+| Robust | 73.4000% | 71.8806% | 74.1222% | 74.2278% |
+| Balanced | 72.2583% | 69.4028% | 71.6278% | 71.7111% |
 
+### External Six-Class Macro-F1
 
-\## Ablation Study
+| Model | Source-only | BN-only | TENT | CAFA v3 |
+|---|---:|---:|---:|---:|
+| Enhanced | 19.4651% | 60.3133% | 61.3416% | 61.4669% |
+| Robust | 76.3687% | 76.7877% | 78.2515% | 78.3286% |
+| Balanced | 74.2878% | 75.1022% | 76.6929% | 76.7495% |
 
+![External classification performance](experiments/starc9_external/statistical_analysis/figures/fig01_external_performance.png)
 
+### Paired External Improvements
 
-Validation results under the simulated domain shift:
-
-
-
-| Configuration | Accuracy | Macro-F1 |
-
+| Model | Accuracy Gain | Macro-F1 Gain |
 |---|---:|---:|
+| Enhanced | +0.144444 pp | +0.125346 pp |
+| Robust | +0.105556 pp | +0.077075 pp |
+| Balanced | +0.083333 pp | +0.056611 pp |
+| Overall | +0.111111 pp | +0.086344 pp |
 
-| Entropy only | 79.86% | 80.05% |
+CAFA v3 improves both accuracy and six-class macro-F1 in all nine paired external comparisons.
 
-| Confidence + Entropy | 79.78% | 79.97% |
+However, the Balanced model retains negative accuracy adaptation relative to source-only.
 
-| Entropy + Alignment | 79.82% | 80.01% |
+The Robust model achieves the highest absolute external performance among the evaluated source models.
 
-| Full CAFA-TTA v1 | 79.79% | 79.99% |
+![External paired effects](experiments/starc9_external/statistical_analysis/figures/fig02_paired_effects.png)
 
+### External Duplicate Sensitivity
 
+The selected external subset contains 49 exact duplicate image groups.
 
-These experiments did not show a consistent improvement from adding confidence filtering or feature alignment to entropy minimization.
+Sensitivity analysis using one representative per pixel group or equal group weighting retains a positive average accuracy difference.
 
+This analysis changes the scoring procedure without rerunning adaptation.
 
+It does not establish how duplicate removal would affect adaptation dynamics.
 
-\## Installation
+### Absent Source Classes
 
+Three source output classes are absent from the selected six-category external target subset.
 
+These outputs remain available and are counted as errors when predicted.
 
-Create and activate a Python virtual environment, then install the project's dependencies.
+CAFA v3 reduces the mean absent-class prediction rate by approximately 0.0926 percentage points relative to TENT.
 
+The external evaluation provides evidence from an additional dataset but does not establish universal cross-hospital generalization.
 
+---
 
-The main dependencies are:
+## Ablation Study
 
+The factorial ablation evaluates confidence-weighted entropy and source-prototype alignment.
 
+| Configuration | Entropy Floor | Alignment Weight |
+|---|---:|---:|
+| Entropy baseline | 1.0 | 0.00 |
+| Soft entropy | 0.2 | 0.00 |
+| Alignment-enabled entropy | 1.0 | 0.05 |
+| Full CAFA v3 | 0.2 | 0.05 |
 
-\- PyTorch and torchvision
+The experiment contains 36 validation runs.
 
-\- medmnist
+![Factorial ablation study](experiments/research_outputs/figures/fig04_ablation_study.png)
 
-\- scikit-learn
+The evaluated objective components provide small improvements under the selected shuffled strong-shift validation protocol.
 
-\- NumPy
+Their effects are not uniformly additive.
 
-\- pandas
+The alignment-enabled variant retains entropy minimization and should not be interpreted as a pure alignment-only method.
 
-\- matplotlib
+Detailed results are available in the [verified ablation table](experiments/research_outputs/tables/table04_ablation_verified.csv).
 
-\- tqdm
+---
 
-\- PyYAML
+## Statistical Analysis
 
+The paired statistical analysis uses:
 
+- Exact McNemar tests.
+- Holm multiple-comparison correction.
+- Conditional image-index bootstrap.
+- Circular block bootstrap.
+- Leave-one-group-out sensitivity analysis.
+- Per-class performance analysis.
 
-Use a PyTorch installation appropriate for the available CPU or GPU environment.
+### Summary
 
+| Metric | PathMNIST | STARC-9 |
+|---|---:|---:|
+| Paired comparisons | 117 | 9 |
+| Accuracy wins | 95 | 9 |
+| Accuracy ties | 11 | 0 |
+| Accuracy losses | 11 | 0 |
+| Mean accuracy gain | +0.0621 pp | +0.111111 pp |
+| Mean macro-F1 gain | +0.0448 pp | +0.086344 pp |
+| Corrected predictions | 812 | 141 |
+| Harmed predictions | 290 | 21 |
+| Net corrected predictions | 522 | 120 |
+| Unadjusted p-values below 0.05 | 31 | 9 |
+| Holm-adjusted p-values below 0.05 | 1 | 9 |
 
+### Conditional Bootstrap Intervals
 
-\## Reproducing Experiments
+The overall conditional 95% bootstrap intervals for the mean accuracy differences are:
 
+| Dataset | Conditional 95% Interval |
+|---|---|
+| PathMNIST | [+0.0539, +0.0705] pp |
+| STARC-9 | [+0.087963, +0.134259] pp |
 
+![PathMNIST conditional bootstrap](experiments/research_outputs/figures/fig06_conditional_forest_plot.png)
 
-Run these commands from the repository root.
+![External conditional bootstrap](experiments/starc9_external/statistical_analysis/figures/fig03_conditional_forest.png)
 
+These intervals are conditional on the saved evaluation samples and adaptation trajectories.
 
+Repeated samples, sequential adaptation, duplicate images, and unavailable patient-level clustering information limit inferential interpretation.
 
-Download the dataset:
+The tests are exploratory rather than confirmatory clinical evidence.
 
+No pooled statistical significance claim is made across the two datasets.
 
+### Per-Class Performance
+
+PathMNIST class-level results show heterogeneous effects, including improvements and degradations in recall.
+
+The higher-support classes account for most net corrected predictions.
+
+![Per-class performance](experiments/research_outputs/figures/fig08_per_class_performance.png)
+
+On the selected external subset, five of six tissue categories improve in both mean recall and F1.
+
+![External per-class effects](experiments/starc9_external/statistical_analysis/figures/fig06_per_class_effects.png)
+
+These findings do not establish improved rare-disease recognition or clinical fairness.
+
+---
+
+## Computational Efficiency
+
+The reference computational benchmark uses an NVIDIA GeForce RTX 3050 Laptop GPU with 4 GB of GPU memory.
+
+| Model | TENT (ms/batch) | CAFA v3 (ms/batch) | Overhead |
+|---|---:|---:|---:|
+| Enhanced | 10.637 | 14.705 | 38.25% |
+| Robust | 10.515 | 14.097 | 34.07% |
+| Balanced | 9.765 | 14.197 | 45.39% |
+
+Additional characteristics:
+
+- Batch size: 64.
+- Trainable BatchNorm affine parameters: 9,600.
+- Float32 source prototype storage: 18 KiB.
+- Additional peak allocated GPU memory: approximately 0.40 to 0.52 MiB relative to TENT.
+
+![Accuracy and computational cost](experiments/research_outputs/figures/fig05_accuracy_cost_tradeoff.png)
+
+The runtime overhead must be considered alongside the small absolute accuracy gains.
+
+The timing measurements use a validation workload and exclude data loading, transfer, and preprocessing.
+
+They do not represent end-to-end clinical deployment latency.
+
+---
+
+## Negative Adaptation
+
+Positive incremental performance relative to TENT does not necessarily imply positive adaptation relative to source-only.
+
+Across the 39 evaluated PathMNIST model-condition groups:
+
+| Method | Negative Accuracy Groups | Negative Macro-F1 Groups |
+|---|---:|---:|
+| BN-only | 15 | 14 |
+| TENT | 15 | 14 |
+| CAFA v3 | 15 | 14 |
+
+![Negative adaptation](experiments/research_outputs/figures/fig13_negative_adaptation.png)
+
+For the external evaluation:
+
+| Method | Negative Accuracy Comparisons |
+|---|---:|
+| BN-only | 6/9 |
+| TENT | 3/9 |
+| CAFA v3 | 3/9 |
+
+CAFA-TTA does not eliminate negative adaptation.
+
+Selecting when adaptation should occur remains an important open research problem.
+
+---
+
+## Installation
+
+### Reference Environment
+
+| Component | Version |
+|---|---|
+| Operating system | Windows |
+| Python | 3.12.10 |
+| PyTorch | 2.10.0+cu128 |
+| Torchvision | 0.25.0+cu128 |
+| CUDA | 12.8 |
+| cuDNN | 9.10.2 |
+| GPU | NVIDIA RTX 3050 Laptop GPU |
+
+### Clone the Repository
 
 ```bash
-
-python scripts/download\_data.py
-
+git clone https://github.com/dtc245200063-alt/CAFA-TTA.git
+cd CAFA-TTA
 ```
 
-
-
-Train the source model:
-
-
+### Create a Virtual Environment
 
 ```bash
-
-python scripts/train\_baseline.py
-
+python -m venv .venv
 ```
 
+Activate on Windows PowerShell:
 
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
 
-Extract source prototypes:
-
-
+### Install CUDA-Enabled PyTorch
 
 ```bash
-
-python scripts/extract\_prototypes.py
-
+python -m pip install torch==2.10.0 torchvision==0.25.0 --index-url https://download.pytorch.org/whl/cu128
 ```
 
-
-
-Run domain-shift and adaptation experiments:
-
-
+### Install Pinned Dependencies
 
 ```bash
-
-python scripts/evaluate\_domain\_shift.py
-
-python scripts/evaluate\_tent.py
-
-python scripts/evaluate\_cafa\_v2.py
-
+python -m pip install -r requirements.txt
 ```
 
-
-
-Run ablation and robustness evaluations:
-
-
+### Verify the Environment
 
 ```bash
-
-python scripts/run\_ablation.py --mode full\_cafa
-
-python scripts/evaluate\_robustness.py
-
+python -m pip check
+python test_cuda.py
 ```
 
+Installation in a fresh environment has not yet been independently verified.
 
+See the complete [Reproducibility Guide](docs/REPRODUCIBILITY.md) for the reference environment, dependencies, dataset preparation, and artifact requirements.
 
-Summarize saved final-test results:
+---
 
+## Quick Start
 
+The following commands describe the original experimental entry points.
+
+Original datasets, compatible source checkpoints, prototypes, and required metadata must be restored before executing the corresponding evaluations.
+
+Run experiments in a separate workspace to avoid overwriting the frozen research outputs.
+
+### Prepare PathMNIST
 
 ```bash
-
-python scripts/summarize\_results.py
-
+python scripts/download_data.py
 ```
 
+### Train Source Models
 
+```bash
+python scripts/train_baseline.py
+python scripts/train_enhanced.py
+python scripts/train_robust.py
+python scripts/train_balanced.py
+```
 
-\*\*Reproducibility note:\*\* The training checkpoint and source prototypes are excluded from version control. Reproducing the reported numbers requires recreating the trained source model and prototypes. Retraining can produce different results.
+The training sequence requires the appropriate initialization checkpoint at each stage.
 
+### Extract Source Prototypes
 
+```bash
+python scripts/extract_prototypes_models.py
+```
 
-\## Limitations
+### Run Final PathMNIST Evaluations
 
+```bash
+python scripts/evaluate_cafa_final_test.py
+python scripts/evaluate_cafa_final_test_severity.py
+python scripts/evaluate_cafa_final_test_corruptions.py
+```
 
+Run the strong-shift evaluation before the severity evaluation because compatible strong-shift results are reused.
 
-1\. Domain shifts are simulated through deterministic color transformations rather than real hospital or scanner differences.
+### Verify Predictions and Analyze Results
 
-2\. The model was trained using one source-model training run.
+```bash
+python scripts/verify_final_test_predictions.py
+python scripts/analyze_statistical_significance.py
+python scripts/analyze_per_class_performance.py
+python scripts/generate_research_figures.py
+```
 
-3\. Robustness evaluation covers three shuffled batch orders, not multiple independently trained source models.
+### Prepare and Evaluate STARC-9
 
-4\. Confidence derived from entropy is not a calibrated estimate of prediction correctness.
+After obtaining the pinned archive and restoring the required original dataset metadata:
 
-5\. Source prototypes are extracted from labeled source training data.
+```bash
+python scripts/prepare_starc9_dataset.py
+python scripts/evaluate_starc9_external.py
+python scripts/analyze_starc9_external.py
+```
 
-6\. CAFA-TTA v2 has not demonstrated a meaningful, stable advantage over TENT.
+The external evaluator checks frozen configuration and artifact hashes.
 
-7\. Continual learning and real cross-hospital adaptation remain future work.
+Equivalent regenerated artifacts may not be byte-identical to the original files.
 
+Do not bypass frozen integrity checks by replacing the original reference hashes.
 
+### Run Ablation and Efficiency Experiments
 
-\## Future Work
+```bash
+python scripts/evaluate_cafa_v3_ablation.py
+python scripts/benchmark_cafa_v3.py
+```
 
+The commands above document the intended execution workflow rather than a certified one-command reproduction pipeline.
 
+---
 
-\- Evaluate real cross-hospital domain shifts.
+## Repository Structure
 
-\- Test multiple source-training seeds.
+```text
+CAFA-TTA/
+|
+|-- core/
+|   |-- cafa_adapter.py
+|   |-- cafa_agreement_adapter.py
+|   `-- cafa_soft_adapter.py
+|
+|-- kernel/
+|   |-- confidence.py
+|   |-- feature_alignment.py
+|   `-- tent.py
+|
+|-- models/
+|   `-- feature_extractor.py
+|
+|-- scripts/
+|   |-- Source training
+|   |-- Prototype extraction
+|   |-- Adaptation evaluation
+|   |-- Statistical analysis
+|   `-- Research figure generation
+|
+|-- experiments/
+|   |-- reproducibility/
+|   |-- cafa_v3_ablation/
+|   |-- cafa_v3_benchmark/
+|   |-- cafa_final_test_strong/
+|   |-- cafa_final_test_severity/
+|   |-- cafa_final_test_corruptions/
+|   |-- statistical_analysis/
+|   |-- research_outputs/
+|   `-- starc9_external/
+|
+|-- docs/
+|   |-- DATASET_LICENSES.md
+|   |-- REPRODUCIBILITY.md
+|   |-- CHECKPOINTS.md
+|   `-- EXPERIMENTS.md
+|
+|-- tests/
+|-- data/                  # Local dataset storage
+|-- checkpoints/           # Local model artifacts
+|-- requirements.txt
+|-- test_cuda.py
+|-- .gitignore
+`-- README.md
+```
 
-\- Investigate more reliable pseudo-label filtering.
+The directory tree is a logical overview.
 
-\- Study sensitivity to batch size and adaptation order.
+Local medical datasets, model weights, and other excluded artifacts are not necessarily present in a fresh repository clone.
 
-\- Explore continual test-time adaptation and catastrophic forgetting.
+---
 
+## Reproducibility
 
+The project preserves the original research configuration and artifact integrity records.
 
-\## Research Conclusion
+### Original Local Audit Results
 
+| Artifact | Verification |
+|---|---|
+| Model checkpoints and prototypes | 8/8 |
+| PathMNIST prediction files | 423/423 |
+| STARC-9 prediction files | 30/30 |
+| PathMNIST research manifest inputs | 15/15 |
+| PathMNIST research manifest outputs | 42/42 |
+| STARC-9 statistical manifest inputs | 35/35 |
+| STARC-9 statistical manifest outputs | 36/36 |
 
+### Reproducibility Records
 
-The experiments demonstrate that confidence-aware prototype alignment can be integrated into a practical test-time adaptation pipeline for medical image classification.
+- [Frozen configuration](experiments/reproducibility/final_config.json)
+- [Frozen dependencies](experiments/reproducibility/requirements_frozen.txt)
+- [Checkpoint hashes](experiments/reproducibility/checkpoint_hashes.csv)
+- [Algorithm hashes](experiments/reproducibility/algorithm_hashes.csv)
+- [PathMNIST research manifest](experiments/research_outputs/research_manifest.json)
+- [STARC-9 external protocol](experiments/starc9_external/external_protocol.json)
+- [STARC-9 statistical manifest](experiments/starc9_external/statistical_analysis/statistical_manifest.json)
 
+### Artifact Availability
 
+The original research package includes:
 
-Most of the observed recovery under the simulated shift comes from using target-batch BatchNorm statistics. The additional improvement from CAFA-TTA v2 compared with TENT is marginal and requires further validation.
+- 453 prediction files.
+- Four trained checkpoints.
+- Four source prototype files.
+- 22 distinct research figures.
+- PNG and PDF figure formats.
+- Statistical tables and reports.
 
+Original checkpoints, prototypes, per-sample predictions, and certain dataset metadata remain subject to availability, redistribution, and privacy review.
+
+No public binary artifact download is asserted at this stage.
+
+Independent reproduction requires access to the relevant original artifacts or an appropriately reconstructed experimental environment.
+
+Retraining may produce different checkpoints and predictions.
+
+The completed local integrity audits do not establish fresh-clone or independent end-to-end reproducibility.
+
+---
+
+## Documentation
+
+| Document | Description |
+|---|---|
+| [DATASET_LICENSES.md](docs/DATASET_LICENSES.md) | Dataset attribution, licensing, preprocessing, and publication policy |
+| [REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md) | Environment, setup, execution workflow, and integrity verification |
+| [CHECKPOINTS.md](docs/CHECKPOINTS.md) | Model lineage, prototype construction, and SHA-256 checksums |
+| [EXPERIMENTS.md](docs/EXPERIMENTS.md) | Detailed experimental design, results, statistical analyses, and limitations |
+
+### Research Outputs
+
+- [PathMNIST figures](experiments/research_outputs/figures/)
+- [PathMNIST research tables](experiments/research_outputs/tables/)
+- [Research findings](experiments/research_outputs/research_findings.md)
+- [Research limitations](experiments/research_outputs/research_limitations.md)
+- [Future work](experiments/research_outputs/future_work.md)
+- [External STARC-9 analysis](experiments/starc9_external/statistical_analysis/)
+
+The research output directories contain the original computational records and should be interpreted together with their associated manifests.
+
+---
+
+## Limitations
+
+The current study has the following important limitations:
+
+1. Absolute improvements over TENT are small.
+
+2. The PathMNIST test set had been accessed during earlier method development.
+
+3. Multiple experimental conditions reuse the same underlying image samples.
+
+4. Source models share a related training lineage.
+
+5. Adaptation seeds do not capture independent source training variability.
+
+6. Entropy-derived confidence is not a calibrated probability of correctness.
+
+7. Statistical analyses are exploratory and conditional on saved adaptation trajectories.
+
+8. Patient-level and slide-level clustering information is unavailable.
+
+9. The external STARC-9 evaluation uses a selected six-category subset with an approximate semantic label mapping.
+
+10. Exact duplicate images are present in the external dataset.
+
+11. Low-resolution 28 x 28 input images lose substantial histopathological detail.
+
+12. STARC-9 images are stain-normalized, limiting the evaluated domain-shift scope.
+
+13. CAFA-TTA introduces additional runtime overhead.
+
+14. Negative adaptation remains unresolved.
+
+15. Independent clean-environment reproduction has not yet been completed.
+
+16. Additional architectures, medical imaging modalities, and adaptation baselines remain to be evaluated.
+
+The results do not establish universal superiority, patient-level diagnostic performance, clinical safety, or clinical effectiveness.
+
+---
+
+## Future Work
+
+Potential research extensions include:
+
+- Negative-adaptation detection.
+- Adaptive alignment strength.
+- Improved uncertainty estimation.
+- Class-balanced adaptation.
+- Continual test-time adaptation.
+- Nonstationary target streams.
+- Additional adaptation baselines.
+- Multiple independent source training seeds.
+- Higher-resolution histopathology evaluation.
+- Alternative backbone architectures.
+- Patient-level and slide-level validation.
+- Independent external replication.
+- Improved computational efficiency.
+
+These directions represent proposed future research rather than completed experiments.
+
+---
+
+## Citation
+
+CAFA-TTA is an ongoing research project.
+
+A formal paper citation or DOI is not available at this stage.
+
+Software citation metadata is provided in [CITATION.cff](CITATION.cff).
+
+When referencing this implementation, identify the project title, repository URL, and exact commit or release version used.
+
+Repository:
+
+https://github.com/dtc245200063-alt/CAFA-TTA
+
+### Related Research
+
+**TENT**
+
+Wang, D., Shelhamer, E., Liu, S., Olshausen, B., and Darrell, T.
+
+Tent: Fully Test-Time Adaptation by Entropy Minimization.
+
+International Conference on Learning Representations, 2021.
+
+https://arxiv.org/abs/2006.10726
+
+**MedMNIST v2**
+
+Yang, J., et al.
+
+MedMNIST v2: A large-scale lightweight benchmark for 2D and 3D biomedical image classification.
+
+Scientific Data, 2023.
+
+https://doi.org/10.1038/s41597-022-01721-8
+
+**STARC-9**
+
+STARC-9: A Large-scale Dataset for Multi-Class Tissue Classification for CRC Histopathology.
+
+NeurIPS Datasets and Benchmarks, 2025.
+
+https://arxiv.org/abs/2511.00383
+
+The original dataset creators should be acknowledged according to their respective attribution requirements.
+
+---
+
+## License
+
+The original CAFA-TTA source code is licensed under the [MIT License](LICENSE). See the license file for the complete terms.
+
+Third-party datasets retain their respective licenses and attribution requirements.
+
+Original medical image datasets are not redistributed by this repository.
+
+Model checkpoints, source prototypes, and dataset-derived artifacts are subject to separate distribution and rights review.
+
+See [Dataset Licenses and Attribution](docs/DATASET_LICENSES.md).
+
+---
+
+## Acknowledgments
+
+This project acknowledges the researchers and contributors responsible for:
+
+- TENT.
+- ResNet.
+- PyTorch.
+- MedMNIST.
+- NCT-CRC-HE-100K.
+- CRC-VAL-HE-7K.
+- STARC-9.
+
+The project is independent research and does not imply endorsement by the original dataset or method developers.
+
+---
+
+## Disclaimer
+
+CAFA-TTA is provided for experimental research and educational purposes.
+
+It is not a clinical diagnostic system or a validated medical device.
+
+The reported performance is limited to the evaluated datasets, source models, adaptation protocols, and computational environment.
+
+---
+
+## Research Conclusion
+
+CAFA-TTA v3 demonstrates small positive average improvements over TENT across the evaluated PathMNIST conditions and the selected external STARC-9 subset.
+
+The results support further investigation of confidence-weighted entropy and source-prototype alignment.
+
+However, the incremental gains are modest, computational overhead is non-negligible, and negative adaptation remains unresolved.
+
+The project prioritizes transparent reporting, preservation of original experimental evidence, and reproducible research practices.
+
+For artifact availability and reproducibility boundaries, see [Publication Scope](docs/PUBLICATION_SCOPE.md).
+
+Third-party software notices are provided in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

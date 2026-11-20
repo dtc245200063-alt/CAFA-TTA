@@ -1,0 +1,380 @@
+{
+  "project": "CAFA-TTA",
+  "dataset": "STARC-9",
+  "analysis_type": "external_post_hoc_statistical_analysis",
+  "created_at_utc": "2026-11-18T21:15:27.490398+00:00",
+  "verified_runs": 30,
+  "paired_comparisons": 9,
+  "target_images": 12000,
+  "target_class_ids": [
+    0,
+    3,
+    4,
+    5,
+    6,
+    8
+  ],
+  "overall": {
+    "accuracy_delta_pp": 0.1111111111111111,
+    "macro_f1_delta_pp": 0.08634383469442576,
+    "absent_prediction_delta_pp": -0.09259259259259288,
+    "wins": 9,
+    "ties": 0,
+    "losses": 0,
+    "corrected_events": 141,
+    "harmed_events": 21,
+    "net_correct_events": 120,
+    "corrected_harmed_ratio": 6.714285714285714,
+    "mean_net_correct_per_run": 13.333333333333334
+  },
+  "statistical_tests": {
+    "method": "exact McNemar",
+    "multiple_testing_correction": "Holm",
+    "alpha": 0.05,
+    "tests": 9,
+    "raw_significant": 9,
+    "holm_significant": 9,
+    "interpretation": "Exploratory marginal paired tests; sample and trajectory dependence limits inferential interpretation."
+  },
+  "conditional_bootstrap": {
+    "repeats": 10000,
+    "seed": 2026,
+    "overall_ci95_lower_pp": 0.08796296296296297,
+    "overall_ci95_upper_pp": 0.13425925925925924,
+    "groups": [
+      {
+        "group": "overall",
+        "pairs": 9,
+        "accuracy_delta_pp": 0.1111111111111111,
+        "ci95_lower_pp": 0.08796296296296297,
+        "ci95_upper_pp": 0.13425925925925924,
+        "bootstrap_repeats": 10000,
+        "resampling_unit": "aligned_original_image_index",
+        "conditional_on_saved_trajectories": true
+      },
+      {
+        "group": "enhanced",
+        "pairs": 3,
+        "accuracy_delta_pp": 0.14444444444444443,
+        "ci95_lower_pp": 0.1,
+        "ci95_upper_pp": 0.18888888888888888,
+        "bootstrap_repeats": 10000,
+        "resampling_unit": "aligned_original_image_index",
+        "conditional_on_saved_trajectories": true
+      },
+      {
+        "group": "robust",
+        "pairs": 3,
+        "accuracy_delta_pp": 0.10555555555555554,
+        "ci95_lower_pp": 0.06666666666666667,
+        "ci95_upper_pp": 0.1472222222222222,
+        "bootstrap_repeats": 10000,
+        "resampling_unit": "aligned_original_image_index",
+        "conditional_on_saved_trajectories": true
+      },
+      {
+        "group": "balanced",
+        "pairs": 3,
+        "accuracy_delta_pp": 0.08333333333333334,
+        "ci95_lower_pp": 0.04999999999999999,
+        "ci95_upper_pp": 0.1222222222222222,
+        "bootstrap_repeats": 10000,
+        "resampling_unit": "aligned_original_image_index",
+        "conditional_on_saved_trajectories": true
+      }
+    ],
+    "conditional_on_saved_trajectories": true,
+    "patient_level_ci": false
+  },
+  "block_bootstrap": {
+    "block_lengths_batches": [
+      1,
+      4,
+      8,
+      16
+    ],
+    "records": 36,
+    "conditional_on_saved_trajectories": true
+  },
+  "duplicate_analysis": {
+    "duplicate_groups": 49,
+    "unique_pixel_groups": 11951,
+    "extra_duplicate_images": 49,
+    "sensitivity_results": [
+      {
+        "scenario": "all_samples",
+        "accuracy_delta_pp": 0.11111111111110998,
+        "macro_f1_delta_pp": 0.08634383469442576,
+        "wins": 9,
+        "ties": 0,
+        "losses": 0
+      },
+      {
+        "scenario": "one_representative_per_group",
+        "accuracy_delta_pp": 0.11156667503416681,
+        "macro_f1_delta_pp": 0.08638219892532402,
+        "wins": 9,
+        "ties": 0,
+        "losses": 0
+      },
+      {
+        "scenario": "equal_weight_per_hash_group",
+        "accuracy_delta_pp": 0.11156667503416805,
+        "macro_f1_delta_pp": 0.08638971659612471,
+        "wins": 9,
+        "ties": 0,
+        "losses": 0
+      }
+    ],
+    "adaptation_rerun": false
+  },
+  "per_class_summary": [
+    {
+      "class_id": 0,
+      "class_name": "ADI",
+      "support": 2000,
+      "tent_precision": 0.9272740384193185,
+      "cafa_precision": 0.9283139814330276,
+      "tent_recall": 0.6063333333333334,
+      "cafa_recall": 0.6067222222222222,
+      "tent_f1": 0.701364265979112,
+      "cafa_f1": 0.7017753197261344,
+      "precision_delta_pp": 0.10399430137090339,
+      "recall_delta_pp": 0.038888888888888924,
+      "f1_delta_pp": 0.041105374702250015,
+      "corrected": 15,
+      "harmed": 8,
+      "net_correct": 7
+    },
+    {
+      "class_id": 3,
+      "class_name": "LYM",
+      "support": 2000,
+      "tent_precision": 0.806884775824757,
+      "cafa_precision": 0.8081004499814693,
+      "tent_recall": 0.8211666666666667,
+      "cafa_recall": 0.8231111111111111,
+      "tent_f1": 0.8135006646337657,
+      "cafa_f1": 0.8150733007830282,
+      "precision_delta_pp": 0.12156741567122481,
+      "recall_delta_pp": 0.19444444444444522,
+      "f1_delta_pp": 0.15726361492624827,
+      "corrected": 35,
+      "harmed": 0,
+      "net_correct": 35
+    },
+    {
+      "class_id": 4,
+      "class_name": "MUC",
+      "support": 2000,
+      "tent_precision": 0.7993456474558654,
+      "cafa_precision": 0.7992513097457961,
+      "tent_recall": 0.6446666666666666,
+      "cafa_recall": 0.6446666666666667,
+      "tent_f1": 0.7135971666541386,
+      "cafa_f1": 0.7135465663989308,
+      "precision_delta_pp": -0.009433771006937973,
+      "recall_delta_pp": -1.2335811384723961e-15,
+      "f1_delta_pp": -0.005060025520794061,
+      "corrected": 11,
+      "harmed": 11,
+      "net_correct": 0
+    },
+    {
+      "class_id": 5,
+      "class_name": "MUS",
+      "support": 2000,
+      "tent_precision": 0.8265119547399856,
+      "cafa_precision": 0.8279990241714003,
+      "tent_recall": 0.4651111111111111,
+      "cafa_recall": 0.4677777777777778,
+      "tent_f1": 0.594653749017974,
+      "cafa_f1": 0.5971651626763741,
+      "precision_delta_pp": 0.1487069431414535,
+      "recall_delta_pp": 0.2666666666666669,
+      "f1_delta_pp": 0.2511413658400124,
+      "corrected": 48,
+      "harmed": 0,
+      "net_correct": 48
+    },
+    {
+      "class_id": 6,
+      "class_name": "NORM",
+      "support": 2000,
+      "tent_precision": 0.8282506149461155,
+      "cafa_precision": 0.8282616226285464,
+      "tent_recall": 0.7547777777777778,
+      "cafa_recall": 0.755388888888889,
+      "tent_f1": 0.7895464171706794,
+      "cafa_f1": 0.7898931077975537,
+      "precision_delta_pp": 0.0011007682430896892,
+      "recall_delta_pp": 0.06111111111111178,
+      "f1_delta_pp": 0.034669062687417734,
+      "corrected": 12,
+      "harmed": 1,
+      "net_correct": 11
+    },
+    {
+      "class_id": 8,
+      "class_name": "TUM",
+      "support": 2000,
+      "tent_precision": 0.6789032467641987,
+      "cafa_precision": 0.6787227333294918,
+      "tent_recall": 0.7518888888888889,
+      "cafa_recall": 0.7529444444444445,
+      "tent_f1": 0.7130585106186419,
+      "cafa_f1": 0.7134479467739565,
+      "precision_delta_pp": -0.01805134347068687,
+      "recall_delta_pp": 0.1055555555555575,
+      "f1_delta_pp": 0.03894361553144549,
+      "corrected": 20,
+      "harmed": 1,
+      "net_correct": 19
+    }
+  ],
+  "negative_adaptation_summary": [
+    {
+      "model": "enhanced",
+      "method": "bn_only",
+      "accuracy_delta_pp": 32.68888888888889,
+      "macro_f1_delta_pp": 40.8481301690824,
+      "negative_accuracy_runs": 0,
+      "negative_f1_runs": 0,
+      "runs": 3
+    },
+    {
+      "model": "enhanced",
+      "method": "tent",
+      "accuracy_delta_pp": 34.12222222222223,
+      "macro_f1_delta_pp": 41.876464472071696,
+      "negative_accuracy_runs": 0,
+      "negative_f1_runs": 0,
+      "runs": 3
+    },
+    {
+      "model": "enhanced",
+      "method": "cafa_v3",
+      "accuracy_delta_pp": 34.26666666666666,
+      "macro_f1_delta_pp": 42.00181040587072,
+      "negative_accuracy_runs": 0,
+      "negative_f1_runs": 0,
+      "runs": 3
+    },
+    {
+      "model": "robust",
+      "method": "bn_only",
+      "accuracy_delta_pp": -1.5194444444444437,
+      "macro_f1_delta_pp": 0.4190160973633968,
+      "negative_accuracy_runs": 3,
+      "negative_f1_runs": 0,
+      "runs": 3
+    },
+    {
+      "model": "robust",
+      "method": "tent",
+      "accuracy_delta_pp": 0.7222222222222204,
+      "macro_f1_delta_pp": 1.8828820103082473,
+      "negative_accuracy_runs": 0,
+      "negative_f1_runs": 0,
+      "runs": 3
+    },
+    {
+      "model": "robust",
+      "method": "cafa_v3",
+      "accuracy_delta_pp": 0.8277777777777754,
+      "macro_f1_delta_pp": 1.9599569079244574,
+      "negative_accuracy_runs": 0,
+      "negative_f1_runs": 0,
+      "runs": 3
+    },
+    {
+      "model": "balanced",
+      "method": "bn_only",
+      "accuracy_delta_pp": -2.855555555555559,
+      "macro_f1_delta_pp": 0.8143827925787902,
+      "negative_accuracy_runs": 3,
+      "negative_f1_runs": 0,
+      "runs": 3
+    },
+    {
+      "model": "balanced",
+      "method": "tent",
+      "accuracy_delta_pp": -0.6305555555555564,
+      "macro_f1_delta_pp": 2.405060358303705,
+      "negative_accuracy_runs": 3,
+      "negative_f1_runs": 0,
+      "runs": 3
+    },
+    {
+      "model": "balanced",
+      "method": "cafa_v3",
+      "accuracy_delta_pp": -0.5472222222222248,
+      "macro_f1_delta_pp": 2.4616710309717535,
+      "negative_accuracy_runs": 3,
+      "negative_f1_runs": 0,
+      "runs": 3
+    }
+  ],
+  "leave_one_group_out": [
+    {
+      "excluded_group_type": "model",
+      "excluded_group": "enhanced",
+      "remaining_pairs": 6,
+      "accuracy_delta_pp": 0.09444444444444444,
+      "macro_f1_delta_pp": 0.06684278514212938
+    },
+    {
+      "excluded_group_type": "model",
+      "excluded_group": "robust",
+      "remaining_pairs": 6,
+      "accuracy_delta_pp": 0.11388888888888889,
+      "macro_f1_delta_pp": 0.09097830323353355
+    },
+    {
+      "excluded_group_type": "model",
+      "excluded_group": "balanced",
+      "remaining_pairs": 6,
+      "accuracy_delta_pp": 0.12499999999999999,
+      "macro_f1_delta_pp": 0.10121041570761435
+    },
+    {
+      "excluded_group_type": "seed",
+      "excluded_group": 42,
+      "remaining_pairs": 6,
+      "accuracy_delta_pp": 0.11527777777777777,
+      "macro_f1_delta_pp": 0.09048074458721429
+    },
+    {
+      "excluded_group_type": "seed",
+      "excluded_group": 123,
+      "remaining_pairs": 6,
+      "accuracy_delta_pp": 0.11388888888888887,
+      "macro_f1_delta_pp": 0.08816654300399611
+    },
+    {
+      "excluded_group_type": "seed",
+      "excluded_group": 2026,
+      "remaining_pairs": 6,
+      "accuracy_delta_pp": 0.10416666666666667,
+      "macro_f1_delta_pp": 0.08038421649206688
+    }
+  ],
+  "figure_count": 9,
+  "model_evaluation_rerun": false,
+  "target_label_training": false,
+  "limitations": [
+    "Statistical analysis was specified after the external evaluation results were observed.",
+    "The McNemar tests are exploratory and do not account fully for within-slide, within-patient or online dependence.",
+    "The conditional image-index bootstrap resamples saved correctness differences, not complete adaptation trajectories.",
+    "Block bootstrap is a temporal sensitivity analysis, not proof of independent samples.",
+    "The same target images are reused across models and stream seeds.",
+    "Nine paired comparisons are not nine independent external datasets.",
+    "Duplicate sensitivity changes scoring weights only, not the adaptation stream.",
+    "Patient and slide identifiers are unavailable in the prepared dataset.",
+    "Target selection uses six approximately compatible tissue categories.",
+    "The target images are stain-normalized and resized to 28x28.",
+    "Macro-F1 confidence intervals were not estimated by this script.",
+    "Prediction events are not unique patients or independent clinical diagnoses.",
+    "A small positive accuracy effect does not establish clinical utility."
+  ]
+}
