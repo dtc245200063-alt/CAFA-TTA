@@ -1,0 +1,21 @@
+services:
+  cafa-cpu-smoke:
+    build:
+      context: .
+      dockerfile: Dockerfile.cpu
+    image: cafa-tta-cpu-smoke:local
+    cpus: 1.0
+    mem_limit: 2g
+    shm_size: 256m
+    restart: "no"
+    environment:
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    volumes:
+      - type: bind
+        source: ..
+        target: /project
+        read_only: true
+      - type: bind
+        source: ./docker_runs
+        target: /outputs

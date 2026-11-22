@@ -1,0 +1,19 @@
+FROM python:3.12-slim-bookworm
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    OMP_NUM_THREADS=1 \
+    MKL_NUM_THREADS=1
+
+RUN python -m pip install --no-cache-dir \
+    --index-url https://download.pytorch.org/whl/cpu \
+    torch==2.10.0 torchvision==0.25.0
+
+RUN python -m pip install --no-cache-dir \
+    medmnist==3.0.2
+
+WORKDIR /runner
+
+COPY cpu_smoke_train.py /runner/cpu_smoke_train.py
+
+ENTRYPOINT ["python", "-u", "/runner/cpu_smoke_train.py"]

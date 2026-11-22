@@ -47,3 +47,12 @@ Thumbs.db
 # Private research artifacts
 /experiments/starc9_external/statistical_analysis/duplicate_group_members.csv
 /experiments/statistical_analysis/paired_batch_outcomes.csv
+
+# CAFA-TTA Docker packaging
+/CAFA-TTA-ALL-IN-ONE/
+/docker-project/docker_runs/
+/docker-project/external_datasets/
+/docker-project/cafa_cpu_workspace/data/
+/START-CAFA-TTA.bat.backup
+/START-CAFA-TTA.bat.before-path-fix.bak
+/docker-project/cafa_cpu_workspace/
