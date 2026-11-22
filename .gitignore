@@ -56,3 +56,6 @@ Thumbs.db
 /START-CAFA-TTA.bat.backup
 /START-CAFA-TTA.bat.before-path-fix.bak
 /docker-project/cafa_cpu_workspace/
+/; $rule=
+/pace cr-at-eol*
+/"pace cr-at-eol*
