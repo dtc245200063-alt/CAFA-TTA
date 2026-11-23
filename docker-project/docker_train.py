@@ -35,6 +35,7 @@ def main() -> None:
     parser.add_argument('--model', choices=SCRIPTS, help='Which ORIGINAL model script to run')
     parser.add_argument('--epochs', type=int, help='Optional smoke-test epoch count (staged copy only)')
     parser.add_argument('--run-name', help='Unique output directory name (letters, digits, underscore, hyphen)')
+    parser.add_argument('--from-run', help='Use prerequisite checkpoints from an earlier Docker run')
     parser.add_argument('--check-gpu', action='store_true', help='Only inspect GPU, then exit')
     args = parser.parse_args()
 
@@ -62,10 +63,23 @@ def main() -> None:
     for file in [script_file, data_file]:
         if not file.is_file():
             raise FileNotFoundError(file)
+    if args.from_run:
+        if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]{0,63}', args.from_run):
+            parser.error('--from-run contains invalid characters')
+        if args.from_run == args.run_name:
+            parser.error('--from-run must differ from --run-name')
+        if not NEEDED_CHECKPOINTS[args.model]:
+            parser.error('--from-run is not needed for this model')
+
+    checkpoint_sources = {}
     for ckpt in NEEDED_CHECKPOINTS[args.model]:
-        file = SOURCE / 'checkpoints' / ckpt
+        if args.from_run:
+            file = OUTPUT / args.from_run / 'workspace' / 'checkpoints' / ckpt
+        else:
+            file = SOURCE / 'checkpoints' / ckpt
         if not file.is_file():
             raise FileNotFoundError(f'Required prerequisite checkpoint absent: {file}')
+        checkpoint_sources[ckpt] = file
     if args.model in {'robust', 'balanced'}:
         required = SOURCE / 'experiments/domain_shift/metrics.json'
         if not required.is_file():
@@ -80,8 +94,8 @@ def main() -> None:
     staged_script = workspace / 'scripts' / SCRIPTS[args.model]
     shutil.copy2(script_file, staged_script)
     (workspace / 'data/raw/medmnist/pathmnist.npz').symlink_to(data_file)
-    for ckpt in NEEDED_CHECKPOINTS[args.model]:
-        shutil.copy2(SOURCE / 'checkpoints' / ckpt, workspace / 'checkpoints' / ckpt)
+    for ckpt, file in checkpoint_sources.items():
+        shutil.copy2(file, workspace / 'checkpoints' / ckpt)
     if args.model in {'robust', 'balanced'}:
         path = workspace / 'experiments/domain_shift'
         path.mkdir(parents=True)
