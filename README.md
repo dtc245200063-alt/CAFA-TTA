@@ -990,3 +990,75 @@ The project prioritizes transparent reporting, preservation of original experime
 For artifact availability and reproducibility boundaries, see [Publication Scope](docs/PUBLICATION_SCOPE.md).
 
 Third-party software notices are provided in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+---
+
+## Unified 17-Class ResNet18
+
+The current application uses one ResNet18 checkpoint with 17
+dataset-prefixed output classes:
+
+- PathMNIST: 9 classes
+- Kather 2016: 8 classes
+
+### Model evaluation
+
+| Dataset | Clean test accuracy | Macro-F1 |
+|---|---:|---:|
+| PathMNIST | 84.18% | 0.7952 |
+| Kather 2016 | 88.29% | 0.8830 |
+
+These results use the balanced 10-epoch training run.
+The best checkpoint was selected using validation performance.
+
+### Windows GUI
+
+Run:
+
+```powershell
+.\OPEN-CAFA-TTA-GUI.bat
+```
+
+The GUI uses `checkpoints/cafa_unified_balanced_best.pt`.
+
+The default inference mode is Source Only.
+CAFA Hybrid-BN and automatic shift detection remain experimental
+and are not enabled in the GUI.
+
+### Datasets
+
+PathMNIST can be prepared with:
+
+```powershell
+python scripts/download_data.py
+```
+
+Kather 2016 is available from:
+https://zenodo.org/records/53169
+
+Prepare it with:
+
+```powershell
+python scripts/prepare_kather2016.py
+```
+
+Kather uses a deterministic per-class split with seed 42:
+3,496 training, 744 validation and 760 test images.
+
+### Research artifacts
+
+Experiment metrics are stored in:
+
+`experiments/unified_balanced_paper_01/`
+
+The source checkpoint and 17 prototypes are separate files.
+See `docs/REPRODUCIBILITY.md` for the broader experimental workflow.
+
+### Limitations
+
+CAFA Hybrid-BN improves accuracy under the tested synthetic shift,
+but reduces accuracy on clean images. It is not a default
+inference method or a clinically validated diagnostic system.
+
+The Kather split is image-level and does not establish
+patient-level independence.

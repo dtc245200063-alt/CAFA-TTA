@@ -1,0 +1,46 @@
+{
+  "metadata": {
+    "split": "validation",
+    "seed": 42,
+    "method": "mean_std_calibrated_threshold",
+    "shift": "brightness_contrast_gamma"
+  },
+  "pathmnist": {
+    "validation_images": 256,
+    "calibration_images": 128,
+    "evaluation_images": 128,
+    "detection_rate": 0.1796875,
+    "false_alarm_rate": 0.0625,
+    "calibration_false_alarm_rate": 0.046875,
+    "threshold": 2.8251975374729184,
+    "target_calibration_fpr": 0.05,
+    "balanced_accuracy": 0.55859375,
+    "clean_center": [
+      0.650992144132033,
+      0.12047799844003748
+    ],
+    "shifted_center": [
+      0.5608014303725213,
+      0.08273272206133697
+    ]
+  },
+  "kather": {
+    "validation_images": 256,
+    "calibration_images": 128,
+    "evaluation_images": 128,
+    "detection_rate": 0.1875,
+    "false_alarm_rate": 0.03125,
+    "calibration_false_alarm_rate": 0.046875,
+    "threshold": 1.2621027193711,
+    "target_calibration_fpr": 0.05,
+    "balanced_accuracy": 0.578125,
+    "clean_center": [
+      0.5842078464338556,
+      0.14063367109702085
+    ],
+    "shifted_center": [
+      0.5180003712885082,
+      0.09448522264028725
+    ]
+  }
+}

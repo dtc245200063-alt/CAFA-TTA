@@ -1,0 +1,75 @@
+{
+  "metadata": {
+    "checkpoint": "cafa_unified_balanced_best.pt",
+    "prototypes": "unified_17_prototypes_balanced.pt",
+    "seed": 42,
+    "labels": [
+      "PathMNIST:ADI",
+      "PathMNIST:BACK",
+      "PathMNIST:DEB",
+      "PathMNIST:LYM",
+      "PathMNIST:MUC",
+      "PathMNIST:MUS",
+      "PathMNIST:NORM",
+      "PathMNIST:STR",
+      "PathMNIST:TUM",
+      "Kather:01_TUMOR",
+      "Kather:02_STROMA",
+      "Kather:03_COMPLEX",
+      "Kather:04_LYMPHO",
+      "Kather:05_DEBRIS",
+      "Kather:06_MUCOSA",
+      "Kather:07_ADIPOSE",
+      "Kather:08_EMPTY"
+    ],
+    "condition": "clean",
+    "max_samples_per_domain": 256,
+    "online_adaptation": true,
+    "protocol": "adapt on unlabeled target batch, then predict same batch; reset between datasets",
+    "macro_f1_class_scope": "9 PathMNIST labels or 8 Kather labels"
+  },
+  "pathmnist": {
+    "source": {
+      "samples": 128,
+      "accuracy": 0.921875,
+      "macro_f1": 0.9186589509946891
+    },
+    "bn_only": {
+      "samples": 128,
+      "accuracy": 0.671875,
+      "macro_f1": 0.7530271470932719
+    },
+    "cafa_v3_hybrid_bn": {
+      "samples": 128,
+      "accuracy": 0.75,
+      "macro_f1": 0.7986155394284449
+    },
+    "adaptation": {
+      "updated_batches": 4,
+      "agreement_samples": 99,
+      "skipped_singleton_samples": 0
+    }
+  },
+  "kather": {
+    "source": {
+      "samples": 128,
+      "accuracy": 0.8671875,
+      "macro_f1": 0.8623907252168121
+    },
+    "bn_only": {
+      "samples": 128,
+      "accuracy": 0.828125,
+      "macro_f1": 0.8661423801479026
+    },
+    "cafa_v3_hybrid_bn": {
+      "samples": 128,
+      "accuracy": 0.765625,
+      "macro_f1": 0.7427593855397007
+    },
+    "adaptation": {
+      "updated_batches": 4,
+      "agreement_samples": 87,
+      "skipped_singleton_samples": 0
+    }
+  }
+}
