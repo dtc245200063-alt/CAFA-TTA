@@ -1095,3 +1095,29 @@ How to read these results:
 
 The Kather split is image-level and does not establish
 patient-level independence.
+
+## Docker environments: CPU, GPU, and unified model
+
+This repository contains separate Docker workflows. They are not interchangeable.
+
+| Workflow | Purpose | Environment | Status |
+|---|---|---|---|
+| CPU Docker | Legacy PathMNIST 9-class and Kather 8-class experiments | Ubuntu/Linux, Docker Engine and Compose | CPU image build and dependency imports verified on Ubuntu VMware |
+| GPU Docker | Legacy PathMNIST baseline, enhanced, robust and balanced training | NVIDIA GPU and compatible container runtime | Compose configuration validated; full GPU build/training not verified |
+| Unified ResNet18 | One checkpoint with 17 dataset-prefixed classes | See the unified training scripts and GUI instructions | Checkpoint and Windows GUI inference verified; clean end-to-end training reproduction not verified |
+
+### Docker instructions by operating system
+
+- **Ubuntu/Linux Bash:** follow [Docker CPU instructions](docker-project/README_CPU.md) for CPU experiments.
+- **Windows PowerShell:** follow [Docker GPU instructions](docker-project/README.md) only when Docker Desktop, WSL 2 and compatible NVIDIA GPU support are available.
+- Docker Engine on Ubuntu may also run the GPU workflow when NVIDIA container support is correctly configured, but this configuration has not been validated here.
+
+Run commands from the directory stated in each Docker README. Bash syntax such as `$PWD` must not be copied unchanged into Windows PowerShell.
+
+### Reproducibility boundaries
+
+Docker CPU and GPU experiments use older pipelines and can have different Kather dataset splits. The unified 17-class model uses its separately documented 3496/744/760 Kather split; do not mix checkpoints, prototypes, or reported test results across these workflows.
+
+Docker Compose validation confirms configuration syntax, not complete training reproducibility. Building an image does not automatically begin training. Dataset files must be obtained separately.
+
+The Windows Tkinter GUI runs outside these Docker containers.
