@@ -1,25 +1,34 @@
-# CAFA-TTA — Final Test Results
+# CAFA-TTA — Summary of Final Results (PathMNIST, synthetic colour shift)
 
-**Dataset:** PathMNIST
+> This file replaces an older summary that described CAFA-TTA **v2**.
+> The numbers below are copied from the main `README.md` (CAFA-TTA **v3**); they are
+> not regenerated here. For the full tables, statistics and caveats see `README.md`,
+> `docs/EXPERIMENTS.md` and `experiments/research_outputs/`.
 
-**Test samples:** 7,180
+**Dataset:** PathMNIST test set (7,180 images)
+**Shift:** synthetic colour transformation (strong shift: brightness 0.75, contrast 1.35, saturation 0.7)
 
-**Domain shift:** Synthetic color transformation
+## Mean accuracy under strong colour shift (per source model)
 
-**Shift configuration:** `{'brightness': 0.75, 'contrast': 1.35, 'saturation': 0.7}`
-
-| Method | Accuracy | Macro-F1 | Runs |
+| Method | Enhanced | Robust | Balanced |
 |---|---:|---:|---:|
-| Source-only | 15.01% | 6.51% | 1 |
-| BN-only | 73.93% | 68.11% | 1 |
-| TENT | 74.54% ± 0.10 | 68.67% ± 0.14 | 3 |
-| CAFA-TTA v2 | 74.58% ± 0.13 | 68.71% ± 0.17 | 3 |
+| Source-only | 17.84% | 81.63% | 78.22% |
+| BN-only | 70.25% | 78.70% | 77.27% |
+| TENT | 71.03% | 79.97% | 78.52% |
+| CAFA v3 | 71.12% | 80.01% | 78.60% |
 
-## Experimental Notes
+## Paired CAFA v3 vs TENT (117 PathMNIST comparisons)
 
-- Source-only and BN-only use one fixed data order.
-- TENT and CAFA-TTA v2 report mean ± sample standard deviation across three shuffled batch orders.
+- Mean accuracy gain: +0.0621 pp; mean macro-F1 gain: +0.0448 pp.
+- Accuracy wins / ties / losses: 95 / 11 / 11.
+- Holm-adjusted p < 0.05 in only 1 of 117 comparisons.
+
+## Notes
+
 - Target labels are used only for evaluation, not for test-time parameter updates.
-- Hyperparameters were selected before final test evaluation.
-- The domain shift is simulated, not a real cross-hospital shift.
-- CAFA-TTA v2 has not demonstrated a robust advantage over TENT.
+- The PathMNIST test set was also accessed during earlier method development, so
+  the final numbers are not a fully untouched hold-out (see Limitations in `README.md`).
+- The shift is simulated, not a real cross-hospital shift.
+- Gains over TENT are small; the Robust source-only model beats every adaptation
+  method under strong shift. CAFA does not remove negative adaptation.
+- Unified 17-class model results: see "Unified 17-Class ResNet18" in `README.md`.

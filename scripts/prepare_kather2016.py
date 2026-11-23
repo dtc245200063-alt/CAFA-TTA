@@ -1,4 +1,4 @@
-﻿"""Download and verify the Kather 2016 5000-tile dataset."""
+"""Download and verify the Kather 2016 5000-tile dataset."""
 from pathlib import Path
 import argparse
 import hashlib
@@ -14,7 +14,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument(
         "--root", type=Path,
-        default=Path("docker-project/external_datasets/kather2016")
+        default=Path("data/raw/kather2016")
     )
     args = p.parse_args()
     root = args.root.resolve()
@@ -67,7 +67,8 @@ def main():
     print("KATHER DATASET: PASS")
     print("CLASSES: 8")
     print("IMAGES: 5000")
-    print("UNIFIED SPLIT: train=3496, val=744, test=760")
+    print("Per-class 70/15/15 split (seed 42) is created by train_unified.py: "
+          "train=3496, val=744, test=760")
     print("EXTRACTED:", destination)
 
 if __name__ == "__main__":

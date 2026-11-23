@@ -1056,9 +1056,42 @@ See `docs/REPRODUCIBILITY.md` for the broader experimental workflow.
 
 ### Limitations
 
-CAFA Hybrid-BN improves accuracy under the tested synthetic shift,
-but reduces accuracy on clean images. It is not a default
-inference method or a clinically validated diagnostic system.
+CAFA Hybrid-BN is **not** a default inference method and is not a clinically
+validated diagnostic system. See the results below.
+
+### Hybrid-BN results (full test sets, one seed, 17-way head)
+
+| Condition | Dataset | Source-only | BN-only | CAFA Hybrid-BN |
+|---|---|---:|---:|---:|
+| Clean | PathMNIST (7,180) | **84.18%** | 56.62% | 62.26% |
+| Clean | Kather (760) | **88.29%** | 12.76% | 48.68% |
+| Synthetic shift | PathMNIST | 2.95% | 51.43% | 55.64% |
+| Synthetic shift | Kather | 28.29% | 13.55% | 38.16% |
+
+Source: `experiments/unified_balanced_paper_01/cafa_hybrid_final_*full_test.json`.
+
+How to read these results:
+
+- CAFA Hybrid-BN **lowers** accuracy on clean images (about -22 pp PathMNIST, -40 pp Kather).
+- The gain over BN-only under shift is small on PathMNIST (+4.2 pp). Hybrid-BN mixes
+  source and target BatchNorm statistics (target weight alpha: PathMNIST 0.75, Kather 0.25,
+  chosen on validation data and per dataset, i.e. the dataset must be known). No
+  "Hybrid-BN without CAFA updates" or TENT baseline was run on the unified model, so the
+  gain cannot yet be attributed to CAFA itself rather than to the BN mixing.
+- Source-only PathMNIST accuracy under shift (2.95%) is below chance because the 17-way
+  head can predict Kather labels; accuracy restricted to the correct dataset's labels
+  was not reported.
+- Robustness runs over batch orders (101/202/303) and the shift-detector / gated-CAFA
+  runs use 128 validation images per dataset. The shift detector flags only about 18%
+  of shifted images at a 5% false-alarm rate, and gated CAFA did not help.
+- The shift definition used by the different experiment scripts has not been unified;
+  numbers from different JSON files should not be compared directly.
+- Training hyper-parameters of the committed checkpoint (image size, learning rate,
+  batch size, sampler) were not recorded. Runs made with the current `train_unified.py`
+  store them under `hyperparameters` in the metrics file.
+- The Kather split used here (per-class 70/15/15, seed 42: 3,496 / 744 / 760) differs
+  from the split in `docker-project/dataset_splits/kather2016_seed42.json`
+  (3,496 / 752 / 752). Do not mix checkpoints or prototypes across the two splits.
 
 The Kather split is image-level and does not establish
 patient-level independence.

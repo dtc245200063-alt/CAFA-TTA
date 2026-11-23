@@ -8,7 +8,9 @@ import numpy as np
 import torch
 from torchvision import transforms
 
-sys.path.insert(0, "/unified")
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "scripts"))
 
 from train_unified import (
     PathMNISTDataset,

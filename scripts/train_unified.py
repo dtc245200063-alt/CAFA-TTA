@@ -228,7 +228,8 @@ def main():
                         "epoch": epoch, "seed": args.seed, "val": metrics}, args.output)
     state = torch.load(args.output, map_location=device, weights_only=True)
     model.load_state_dict(state["model_state_dict"])
-    results = {"labels": labels, "seed": args.seed, "best_epoch": state["epoch"],
+    results = {"hyperparameters": {k: str(v) for k, v in vars(args).items()},
+               "labels": labels, "seed": args.seed, "best_epoch": state["epoch"],
                "selection": "best combined validation macro-F1", "history": history,
                "test_pathmnist": compute_metrics(model, DataLoader(
                    PathMNISTDataset(args.pathmnist, "test", eval_tfm), shuffle=False, **loader_args), device),

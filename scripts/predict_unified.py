@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("image", type=Path)
-    parser.add_argument("--checkpoint", type=Path, default=ROOT / "checkpoints/cafa_tta_unified_best.pt")
+    parser.add_argument("--checkpoint", type=Path, default=ROOT / "checkpoints/cafa_unified_balanced_best.pt")
     args = parser.parse_args()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     state = torch.load(args.checkpoint, map_location="cpu", weights_only=True)

@@ -66,5 +66,10 @@ def main():
     print("CONFIDENCE KERNEL TEST PASSED")
 
 
+def test_smoke():
+    """pytest entry point: runs the original self-checking script."""
+    main()
+
+
 if __name__ == "__main__":
     main()

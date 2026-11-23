@@ -1,4 +1,4 @@
-﻿services:
+services:
   trainer:
     build:
       context: .
@@ -8,7 +8,7 @@
     working_dir: /runner
     volumes:
       - type: bind
-        source: ..
+        source: ${CAFA_PROJECT_PATH:-..}
         target: /project
         read_only: true
       - type: bind

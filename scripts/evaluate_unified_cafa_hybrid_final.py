@@ -8,6 +8,10 @@ Example Docker invocation is in --help epilog / accompanying chat instructions.
 """
 from __future__ import annotations
 
+import sys as _sys
+from pathlib import Path as _Path
+_sys.path.insert(0, str(_Path(__file__).resolve().parents[1]))
+
 import argparse
 import copy
 import json
@@ -119,7 +123,8 @@ def eval_domain(name, dataset, base_model, prototypes, args, device):
 
     # Experimental hybrid BN: 75% source + 25% target.
     # Preserve BN affine parameters for CAFA adaptation.
-    selected_alpha = 0.75 if name == "pathmnist" else 0.25
+    selected_alpha = (args.alpha if args.alpha is not None
+                      else (0.75 if name == "pathmnist" else 0.25))
     from types import MethodType
 
     def hybrid_bn_forward(bn, x):
@@ -220,7 +225,9 @@ def main():
     p.add_argument("--lr", type=float, default=1e-4)
     p.add_argument("--lambda-align", type=float, default=0.05)
     p.add_argument("--entropy-floor", type=float, default=0.2)
-    p.add_argument("--alpha", type=float, required=True)
+    p.add_argument("--alpha", type=float, default=None,
+                   help="Target-statistics weight for Hybrid-BN. Default: per-domain "
+                        "values chosen on validation (PathMNIST 0.75, Kather 0.25).")
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--log-every", type=int, default=4)
     args = p.parse_args()
@@ -261,6 +268,8 @@ def main():
     result = {"metadata": {"checkpoint": args.checkpoint.name, "prototypes": args.prototypes.name,
                            "seed": seed, "labels": labels, "condition": args.condition,
                            "max_samples_per_domain": args.max_samples,
+                           "hybrid_bn_alpha": (args.alpha if args.alpha is not None else
+                                               {"pathmnist": 0.75, "kather": 0.25}),
                            "online_adaptation": True,
                            "protocol": "adapt on unlabeled target batch, then predict same batch; reset between datasets",
                            "macro_f1_class_scope": "9 PathMNIST labels or 8 Kather labels"}}

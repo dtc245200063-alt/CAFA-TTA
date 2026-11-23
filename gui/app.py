@@ -1,4 +1,4 @@
-﻿"""CAFA-TTA unified histopathology research demo.
+"""CAFA-TTA unified histopathology research demo.
 
 Uses a single 17-output ResNet18 checkpoint trained on PathMNIST and Kather 2016.
 The 17 labels are dataset-prefixed and are NOT a harmonized medical taxonomy.
@@ -20,7 +20,7 @@ from torchvision import models, transforms
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data/raw/medmnist/pathmnist.npz"
 CHECKPOINT = ROOT / "checkpoints/cafa_unified_balanced_best.pt"
-METRICS = ROOT / "checkpoints/cafa_tta_unified_best.metrics.json"
+METRICS = ROOT / "experiments/unified_balanced_paper_01/cafa_unified_balanced_best.metrics.json"
 OLD_RUN_ROOT = ROOT / "docker-project/docker_runs"
 
 
@@ -275,7 +275,7 @@ class CAFAApp:
         def write(line=""):
             display.insert("end", str(line) + "\n")
 
-        write("UNIFIED RESNET18 — CLEAN TEST (17 labels, 3 training epochs)")
+        write("UNIFIED RESNET18 — CLEAN TEST (17 labels)")
         write("=" * 62)
         if METRICS.is_file():
             try:
@@ -286,11 +286,12 @@ class CAFAApp:
                     write(f"{title}: Accuracy {result['accuracy'] * 100:.2f}% | "
                           f"Macro-F1 {result['macro_f1']:.4f} | "
                           f"n={result['samples']}")
-                write(f"Selected epoch: {metrics.get('best_epoch', 'N/A')}")
+                write(f"Training epochs: {len(metrics.get('history', []))} | "
+                      f"selected epoch: {metrics.get('best_epoch', 'N/A')}")
             except Exception as exc:
                 write(f"Unable to read unified metrics: {exc}")
         else:
-            write("Unified metrics not found in checkpoints folder.")
+            write(f"Unified metrics not found: {METRICS}")
         write()
         write("OLDER SEPARATE-MODEL BENCHMARKS (NOT THE UNIFIED MODEL)")
         write("=" * 62)
