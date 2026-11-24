@@ -248,8 +248,9 @@ def main():
     )
     args = parser.parse_args()
 
-    global KATHER, RUN_DIR, CHECKPOINT, PROTO_FILE, OUTPUT_DIR
-    KATHER = Path(args.kather_root) / "extracted"
+    global KATHER, DATA_ROOT, RUN_DIR, CHECKPOINT, PROTOTYPE_FILE, OUTPUT_DIR
+    KATHER = Path(args.kather_root)
+    DATA_ROOT = KATHER / "extracted" / "Kather_texture_2016_image_tiles_5000"
     RUN_DIR = Path(args.run_dir)
     CHECKPOINT = RUN_DIR / "best.pt"
     PROTOTYPE_FILE = RUN_DIR / "source_prototypes.pt"
