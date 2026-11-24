@@ -40,3 +40,26 @@ The present JSON summaries do not contain those prediction arrays.
 The archived statistical bootstrap concerns a separate paired
 evaluation and must not be presented as significance testing
 for this new Hybrid-BN ablation.
+
+## Paired McNemar significance audit
+
+Exact two-sided McNemar tests compare CAFA Hybrid-BN
+with non-adaptive Hybrid-BN on the same test samples.
+Holm correction is applied across all four comparisons.
+
+| Condition | Domain | CAFA delta (pp) | Hybrid-only correct | CAFA-only correct | Exact p | Holm p | Significant |
+|---|---|---:|---:|---:|---:|---:|---|
+| clean | pathmnist | +1.0167 | 40 | 113 | 2.94681723e-09 | 8.84045168e-09 | Yes |
+| clean | kather | +0.9211 | 1 | 8 | 0.0390625 | 0.078125 | No |
+| shifted | pathmnist | +1.1142 | 29 | 109 | 4.20155793e-12 | 1.68062317e-11 | Yes |
+| shifted | kather | -0.5263 | 4 | 0 | 0.125 | 0.125 | No |
+
+## Statistical limitations
+
+- Results use one trained checkpoint (seed 42).
+- Significance is conditional on this checkpoint, dataset,
+  sample ordering, and evaluation protocol.
+- PathMNIST is significant in both conditions after Holm.
+- Kather is not significant in either condition.
+- This analysis does not establish robustness across
+  independently trained checkpoints or external institutions.

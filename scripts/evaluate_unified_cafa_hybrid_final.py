@@ -217,6 +217,59 @@ def eval_domain(name, dataset, base_model, prototypes, args, device):
               for method, data in outcomes.items()}
     result["adaptation"] = {"updated_batches": updates, "agreement_samples": agreements,
                             "skipped_singleton_samples": skipped_singletons}
+    # Paired correctness comparison: same samples, same batch order.
+    from math import comb
+    truths = outcomes["cafa_v3_hybrid_bn"]["true"]
+    hybrid_preds = outcomes["hybrid_bn_no_adapt"]["pred"]
+    cafa_preds = outcomes["cafa_v3_hybrid_bn"]["pred"]
+
+    both_correct = both_wrong = hybrid_only_correct = cafa_only_correct = 0
+
+    for truth, hp, cp in zip(truths, hybrid_preds, cafa_preds):
+        h = hp == truth
+        c = cp == truth
+        if h and c:
+            both_correct += 1
+        elif h:
+            hybrid_only_correct += 1
+        elif c:
+            cafa_only_correct += 1
+        else:
+            both_wrong += 1
+
+    discordant = hybrid_only_correct + cafa_only_correct
+    if discordant:
+        k = min(hybrid_only_correct, cafa_only_correct)
+        p_exact = min(
+            1.0,
+            2 * sum(comb(discordant, i) for i in range(k + 1))
+            / (2 ** discordant)
+        )
+    else:
+        p_exact = 1.0
+
+    assert (
+        both_correct + both_wrong
+        + hybrid_only_correct + cafa_only_correct
+        == len(truths)
+    )
+
+    result["paired_hybrid_vs_cafa"] = {
+        "both_correct": both_correct,
+        "both_wrong": both_wrong,
+        "hybrid_only_correct": hybrid_only_correct,
+        "cafa_only_correct": cafa_only_correct,
+        "discordant": discordant,
+        "mcnemar_exact_p": p_exact,
+    }
+    print(
+        f"PAIRED AUDIT {name}: "
+        f"Hybrid-only={hybrid_only_correct}, "
+        f"CAFA-only={cafa_only_correct}, "
+        f"McNemar p={p_exact:.8g}",
+        flush=True
+    )
+
     result["cafa_vs_hybrid_no_adapt_different"] = sum(
         a != b for a, b in zip(
             outcomes["cafa_v3_hybrid_bn"]["pred"],
