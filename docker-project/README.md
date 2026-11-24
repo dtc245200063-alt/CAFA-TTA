@@ -49,14 +49,14 @@ docker compose run --rm trainer --model baseline --run-name baseline_full_01
 Enhanced từ checkpoint baseline gốc; số epoch mặc định 15:
 
 ```powershell
-docker compose run --rm trainer --model enhanced --run-name enhanced_full_01
+docker compose run --rm trainer --model enhanced --run-name enhanced_full_01 --from-run baseline_full_01
 ```
 
 Robust và Balanced từ checkpoint Enhanced gốc; cấu hình mặc định 8 và 6 epoch:
 
 ```powershell
-docker compose run --rm trainer --model robust --run-name robust_full_01
-docker compose run --rm trainer --model balanced --run-name balanced_full_01
+docker compose run --rm trainer --model robust --run-name robust_full_01 --from-run enhanced_full_01
+docker compose run --rm trainer --model balanced --run-name balanced_full_01 --from-run enhanced_full_01
 ```
 
 **Không dùng lại run-name cũ.** Chương trình chủ động từ chối ghi đè. Các checkpoint sau train lưu trong `docker_runs/<run-name>/workspace/checkpoints/`; lịch sử Enhanced/Robust/Balanced lưu trong thư mục `experiments` của workspace tương ứng.
@@ -74,7 +74,7 @@ docker compose run --rm trainer --model balanced --run-name balanced_full_01
 ## Ghi chú về phạm vi (cập nhật)
 
 - `CAFA_PROJECT_PATH` trong `.env` hiện được `compose.yaml` / `compose.cpu.yaml` sử dụng (mặc định `..`).
-- Muốn train `enhanced`, `robust`, `balanced` phải có sẵn checkpoint từ lượt train trước trong `checkpoints/` (các file `*.pt` không nằm trong Git). Chạy `baseline` trước, rồi `enhanced`, rồi `robust`/`balanced`.
+- For `enhanced`, `robust`, and `balanced`, use `--from-run` to reuse the prerequisite checkpoint from an earlier run in `docker_runs/`. Without `--from-run`, the prerequisite checkpoint must exist in `/project/checkpoints/`. Legacy checkpoints are not included in Git.
 - Bộ Docker này không bao gồm mô hình 17 lớp; xem `scripts/train_unified.py` và README chính.
 - Split Kather trong `dataset_splits/kather2016_seed42.json` (3496/752/752) khác split của mô hình 17 lớp (3496/744/760).
 
