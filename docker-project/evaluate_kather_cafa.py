@@ -248,11 +248,12 @@ def main():
     )
     args = parser.parse_args()
 
-    global KATHER, RUN_DIR, CHECKPOINT, PROTO_FILE, OUTPUT_DIR
-    KATHER = Path(args.kather_root) / "extracted"
+    global KATHER, DATA_ROOT, RUN_DIR, CHECKPOINT, PROTOTYPE_FILE, OUTPUT_DIR
+    KATHER = Path(args.kather_root)
+    DATA_ROOT = KATHER / 'extracted' / 'Kather_texture_2016_image_tiles_5000'
     RUN_DIR = Path(args.run_dir)
     CHECKPOINT = RUN_DIR / "best.pt"
-    PROTO_FILE = RUN_DIR / "source_prototypes.pt"
+    PROTOTYPE_FILE = RUN_DIR / "source_prototypes.pt"
     OUTPUT_DIR = RUN_DIR / "cafa_comparison_shifted_seed42"
 
     torch.set_num_threads(1)
