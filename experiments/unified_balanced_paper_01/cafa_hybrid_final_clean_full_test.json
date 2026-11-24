@@ -24,7 +24,17 @@
     ],
     "condition": "clean",
     "max_samples_per_domain": 0,
+    "hybrid_bn_alpha": {
+      "pathmnist": 0.75,
+      "kather": 0.25
+    },
     "online_adaptation": true,
+    "comparison_methods": {
+      "source": "source running BN statistics",
+      "bn_only": "target batch BN statistics",
+      "hybrid_bn_no_adapt": "mixed BN without updates",
+      "cafa_v3_hybrid_bn": "mixed BN with CAFA updates"
+    },
     "protocol": "adapt on unlabeled target batch, then predict same batch; reset between datasets",
     "macro_f1_class_scope": "9 PathMNIST labels or 8 Kather labels"
   },
@@ -39,6 +49,11 @@
       "accuracy": 0.5661559888579387,
       "macro_f1": 0.6295145096145354
     },
+    "hybrid_bn_no_adapt": {
+      "samples": 7180,
+      "accuracy": 0.6123955431754875,
+      "macro_f1": 0.6618569831157368
+    },
     "cafa_v3_hybrid_bn": {
       "samples": 7180,
       "accuracy": 0.6225626740947076,
@@ -48,7 +63,16 @@
       "updated_batches": 225,
       "agreement_samples": 5887,
       "skipped_singleton_samples": 0
-    }
+    },
+    "paired_hybrid_vs_cafa": {
+      "both_correct": 4357,
+      "both_wrong": 2670,
+      "hybrid_only_correct": 40,
+      "cafa_only_correct": 113,
+      "discordant": 153,
+      "mcnemar_exact_p": 2.946817226157902e-09
+    },
+    "cafa_vs_hybrid_no_adapt_different": 194
   },
   "kather": {
     "source": {
@@ -61,6 +85,11 @@
       "accuracy": 0.12763157894736843,
       "macro_f1": 0.16249032226231977
     },
+    "hybrid_bn_no_adapt": {
+      "samples": 760,
+      "accuracy": 0.4776315789473684,
+      "macro_f1": 0.5032552088947522
+    },
     "cafa_v3_hybrid_bn": {
       "samples": 760,
       "accuracy": 0.4868421052631579,
@@ -70,6 +99,15 @@
       "updated_batches": 24,
       "agreement_samples": 515,
       "skipped_singleton_samples": 0
-    }
+    },
+    "paired_hybrid_vs_cafa": {
+      "both_correct": 362,
+      "both_wrong": 389,
+      "hybrid_only_correct": 1,
+      "cafa_only_correct": 8,
+      "discordant": 9,
+      "mcnemar_exact_p": 0.0390625
+    },
+    "cafa_vs_hybrid_no_adapt_different": 34
   }
 }
