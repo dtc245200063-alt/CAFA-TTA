@@ -2780,3 +2780,23 @@ Notes:
   files and 77-87% in the batch-order files).
 - No "Hybrid-BN without CAFA updates" or TENT baseline exists for this model, so the effect of CAFA
   cannot be separated from the effect of mixing BatchNorm statistics.
+
+## Unified Hybrid-BN full-test ablation (updated)
+
+The unified 17-class model has been evaluated against a
+non-adaptive Hybrid-BN baseline on full clean and shifted
+test sets (PathMNIST: 7,180; Kather: 760).
+
+The published JSONs contain `hybrid_bn_no_adapt`,
+`cafa_v3_hybrid_bn`, and `paired_hybrid_vs_cafa`.
+
+Exact two-sided McNemar tests with Holm correction show
+a significant CAFA improvement for PathMNIST clean and
+shifted, but not for Kather clean or shifted.
+
+Results and methodological limitations:
+- `docs/UNIFIED_HYBRID_BN_ABLATION.md`
+- `docs/UNIFIED_HYBRID_BN_VALIDATION.md`
+
+These results use one trained checkpoint. Independent
+training-seed replication is still outstanding.

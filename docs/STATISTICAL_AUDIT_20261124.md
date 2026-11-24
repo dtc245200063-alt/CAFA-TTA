@@ -95,8 +95,24 @@ cannot be attributed solely to CAFA's optimization step.
 
 ### Remaining experimental limitations
 
-- Full-test and multi-seed validation of the new non-adaptive
-  Hybrid-BN baseline remains outstanding.
+- Full-test clean/shifted ablation with the non-adaptive
+  Hybrid-BN baseline is complete. Three 256-image shifted
+  validation evaluations also exist, but they share one
+  trained checkpoint and are not independent training seeds.
 - Independent external-domain generalization remains unproven.
 - The archived batch-level bootstrap source is available in
   the original project but is not included in this repository.
+
+### Updated validation interpretation
+
+The earlier 256-image shifted ablation reported identical final
+classification labels for CAFA and non-adaptive Hybrid-BN.
+This statement is specific to that experiment.
+
+In the later shifted validation sensitivity evaluation, seed 42
+produced one fewer correct PathMNIST prediction with CAFA.
+The other five dataset/seed accuracy comparisons were tied.
+See `docs/UNIFIED_HYBRID_BN_VALIDATION.md`.
+
+The full-test paired McNemar results are documented in
+`docs/UNIFIED_HYBRID_BN_ABLATION.md`.

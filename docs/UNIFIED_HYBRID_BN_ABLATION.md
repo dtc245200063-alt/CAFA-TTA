@@ -13,15 +13,15 @@
 
 | Condition | Domain | Source | BN-only | Hybrid-BN no adaptation | CAFA Hybrid-BN | CAFA delta (pp) |
 |---|---|---:|---:|---:|---:|---:|
-| Clean | pathmnist | 84.1783% | 56.6156% | 61.2396% | 62.2563% | +1.0167 |
-| Clean | kather | 88.2895% | 12.7632% | 47.7632% | 48.6842% | +0.9211 |
+| Clean | pathmnist | 84.18% | 56.62% | 61.24% | 62.26% | +1.0167 |
+| Clean | kather | 88.29% | 12.76% | 47.76% | 48.68% | +0.9211 |
 
-Source JSON SHA256 (Clean): `3e3cf3a86ea3f65b2a35a094bbd30283405f4e926c8f0fae736be94efb0f4be7`
+Source JSON SHA256 (Clean): `a1f85910a7a47d65a1dd29919b5ab73864ee3334b7bd3e464462950e10aec90d`
 
 | Shifted | pathmnist | 2.9526% | 51.4345% | 54.5265% | 55.6407% | +1.1142 |
 | Shifted | kather | 28.2895% | 13.5526% | 38.6842% | 38.1579% | -0.5263 |
 
-Source JSON SHA256 (Shifted): `1e39e1659a961d22b794e6fc3804ae3011b6dca10acfd38fed68c1f9898de95f`
+Source JSON SHA256 (Shifted): `f4f800e5114dda9291a9cf255d504eb1081c79aacecc5f9362fad9f63365a1a7`
 
 ## Interpretation
 
@@ -33,9 +33,11 @@ The result is not uniformly positive across domains.
 Accuracy improvements alone do not establish statistical
 significance or generalization across independent training seeds.
 
-Per-sample paired predictions are needed for exact McNemar
-testing of CAFA versus non-adaptive Hybrid-BN.
-The present JSON summaries do not contain those prediction arrays.
+Exact McNemar testing has now been completed using paired
+correctness counts from the same test samples. The published
+JSON files contain the four correctness counts and exact p-value.
+Per-sample prediction arrays are not required to recompute the
+exact McNemar p-value from these counts.
 
 The archived statistical bootstrap concerns a separate paired
 evaluation and must not be presented as significance testing

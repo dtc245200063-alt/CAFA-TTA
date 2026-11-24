@@ -1061,12 +1061,12 @@ validated diagnostic system. See the results below.
 
 ### Hybrid-BN results (full test sets, one seed, 17-way head)
 
-| Condition | Dataset | Source-only | BN-only | CAFA Hybrid-BN |
-|---|---|---:|---:|---:|
-| Clean | PathMNIST (7,180) | **84.18%** | 56.62% | 62.26% |
-| Clean | Kather (760) | **88.29%** | 12.76% | 48.68% |
-| Synthetic shift | PathMNIST | 2.95% | 51.43% | 55.64% |
-| Synthetic shift | Kather | 28.29% | 13.55% | 38.16% |
+| Condition | Dataset | Source-only | BN-only | Hybrid-BN no adaptation | CAFA Hybrid-BN |
+|---|---|---:|---:|---:|---:|
+| Clean | pathmnist (7,180) | 84.18% | 56.62% | 61.24% | 62.26% |
+| Clean | kather (760) | 88.29% | 12.76% | 47.76% | 48.68% |
+| Synthetic shift | pathmnist (7,180) | 2.95% | 51.43% | 54.53% | 55.64% |
+| Synthetic shift | kather (760) | 28.29% | 13.55% | 38.68% | 38.16% |
 
 Source: `experiments/unified_balanced_paper_01/cafa_hybrid_final_*full_test.json`.
 
@@ -1075,9 +1075,11 @@ How to read these results:
 - CAFA Hybrid-BN **lowers** accuracy on clean images (about -22 pp PathMNIST, -40 pp Kather).
 - The gain over BN-only under shift is small on PathMNIST (+4.2 pp). Hybrid-BN mixes
   source and target BatchNorm statistics (target weight alpha: PathMNIST 0.75, Kather 0.25,
-  chosen on validation data and per dataset, i.e. the dataset must be known). No
-  "Hybrid-BN without CAFA updates" or TENT baseline was run on the unified model, so the
-  gain cannot yet be attributed to CAFA itself rather than to the BN mixing.
+  chosen on validation data and per dataset, i.e. the dataset must be known). A non-adaptive Hybrid-BN baseline has now been evaluated on the same
+  unified 17-class checkpoint. CAFA improves over that baseline on
+  PathMNIST clean and shifted full test after Holm correction, but
+  neither Kather comparison is statistically significant.
+  A separate unified-model TENT comparison remains outstanding.
 - Source-only PathMNIST accuracy under shift (2.95%) is below chance because the 17-way
   head can predict Kather labels; accuracy restricted to the correct dataset's labels
   was not reported.
