@@ -252,7 +252,7 @@ def main():
     KATHER = Path(args.kather_root) / "extracted"
     RUN_DIR = Path(args.run_dir)
     CHECKPOINT = RUN_DIR / "best.pt"
-    PROTO_FILE = RUN_DIR / "source_prototypes.pt"
+    PROTOTYPE_FILE = RUN_DIR / "source_prototypes.pt"
     OUTPUT_DIR = RUN_DIR / "cafa_comparison_shifted_seed42"
 
     torch.set_num_threads(1)

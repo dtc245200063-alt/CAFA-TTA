@@ -94,9 +94,9 @@ Run the stages in order:
 Example commands (Ubuntu, from `docker-project/`, GPU required):
 
 ```bash
-docker compose run --rm trainer python /runner/docker_train.py --model baseline --run-name baseline_01
-docker compose run --rm trainer python /runner/docker_train.py --model enhanced --run-name enhanced_01 --from-run baseline_01
-docker compose run --rm trainer python /runner/docker_train.py --model robust --run-name robust_01 --from-run enhanced_01
+docker compose run --rm trainer --model baseline --run-name baseline_01
+docker compose run --rm trainer --model enhanced --run-name enhanced_01 --from-run baseline_01
+docker compose run --rm trainer --model robust --run-name robust_01 --from-run enhanced_01
 ```
 
 The `--from-run` option reads the prerequisite checkpoint from
