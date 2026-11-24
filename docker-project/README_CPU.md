@@ -31,7 +31,7 @@ The fixed image-level split has 3496 training, 752 validation and 752 test image
 docker compose -f compose.cpu.yaml run --rm -v "$PWD/train_kather_cpu.py:/runner/train_kather_cpu.py:ro" -v "$PWD/external_datasets/kather2016:/kather:ro" --entrypoint python cafa-cpu-smoke -u /runner/train_kather_cpu.py --run-name example_kather_01 --epochs 3
 
 ## Evaluation notes
-Evaluation scripts currently reference named checkpoint directories; prepare matching runs or update those paths before evaluating.
+For CAFA Kather evaluation, use --run-dir (containing best.pt and source_prototypes.pt) and --kather-root (containing split_seed42.json and extracted/). Other evaluators may still need configured paths.
 CAFA evaluation requires Kather source prototypes and uses main project modules from /project.
 Test-time adaptation uses test images without target labels for parameter updates.
 The image-level Kather split does not guarantee patient-level independence.
@@ -40,3 +40,14 @@ The image-level Kather split does not guarantee patient-level independence.
 Use a new run name for each training run. Do not overwrite existing checkpoints.
 CPU experiments and the separate GPU Docker configuration are not interchangeable.
 Docker builds do not automatically start training.
+
+
+## CAFA Kather evaluation with explicit paths
+
+From `docker-project/`, with `external_datasets/kather2016` and checkpoint files prepared:
+
+```bash
+docker compose -f compose.cpu.yaml run --rm -v "$PWD/evaluate_kather_cafa.py:/runner/evaluate_kather_cafa.py:ro" -v "$PWD/external_datasets/kather2016:/kather:ro" --entrypoint python cafa-cpu-smoke -u /runner/evaluate_kather_cafa.py --run-dir /outputs/example_kather_01 --kather-root /kather
+```
+
+Use a new evaluation run directory to avoid overwriting earlier results.

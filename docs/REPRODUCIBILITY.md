@@ -2690,3 +2690,17 @@ All reported conclusions should be interpreted
 within the scope of the evaluated datasets,
 
 models, adaptation protocols, and statistical assumptions.
+
+
+## Unified 17-class model (added later)
+
+- Data: `python scripts/prepare_kather2016.py` downloads and MD5-checks Kather 2016 into `data/raw/kather2016`;
+  PathMNIST goes to `data/raw/medmnist/pathmnist.npz`.
+- Split: `train_unified.split_items` makes a per-class 70/15/15 split with seed 42
+  (3,496 / 744 / 760). The Docker Kather split in
+  `docker-project/dataset_splits/kather2016_seed42.json` (3,496 / 752 / 752) is **different**; do not
+  mix checkpoints, prototypes or results between the two.
+- Train: `python scripts/train_unified.py --check-only` validates the layout; the committed checkpoint's
+  full command was not recorded (see `CHECKPOINTS.md` section 21).
+- Verify artifacts: `sha256sum -c experiments/unified_balanced_paper_01/SHA256SUMS.txt`.
+- Fresh-clone, end-to-end reproduction of this pipeline has not been verified.

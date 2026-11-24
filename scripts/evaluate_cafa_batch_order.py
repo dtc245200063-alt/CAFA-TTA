@@ -269,6 +269,9 @@ def main():
     result = {"metadata": {"checkpoint": args.checkpoint.name, "prototypes": args.prototypes.name,
                            "seed": seed, "labels": labels, "condition": args.condition,
                            "max_samples_per_domain": args.max_samples,
+                           "sampled_pool_per_domain": 256,
+                           "evaluated_samples_per_domain": 128,
+                           "split": "validation",
                            "online_adaptation": True,
                            "protocol": "adapt on unlabeled target batch, then predict same batch; reset between datasets",
                            "macro_f1_class_scope": "9 PathMNIST labels or 8 Kather labels"}}

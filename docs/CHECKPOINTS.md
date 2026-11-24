@@ -1534,3 +1534,25 @@ The original research checkpoints provide
 a fixed computational reference for
 
 the reported CAFA-TTA experiments.
+
+
+## 21. Unified 17-Class Checkpoint (added after the original audit)
+
+This section is **not** covered by the frozen checksums and audit in sections 9-11.
+
+| Artifact | SHA-256 |
+|---|---|
+| `checkpoints/cafa_unified_balanced_best.pt` | `2f6c28cc9187c87ef6a8a2b5b2266e16f2286116c2a2446b45bb60f2e22d80a4` |
+| `checkpoints/unified_17_prototypes_balanced.pt` | `82ef6ff4c7044b365f04ee3f0c4fdb2f1c417c9529d86ca88f01ec629715320c` |
+
+- Architecture: ResNet-18, one linear head with 17 dataset-prefixed outputs
+  (9 `PathMNIST:*` + 8 `Kather:*`). The labels are not a harmonised medical taxonomy.
+- Training script: `scripts/train_unified.py` (AdamW, cross-entropy, flips only, normalisation mean=std=0.5).
+- Metrics file: `experiments/unified_balanced_paper_01/cafa_unified_balanced_best.metrics.json`
+  (10 epochs, epoch 8 selected by combined validation macro-F1, seed 42).
+- Prototypes: train-split only, from `scripts/extract_unified_prototypes.py`.
+- **Not recorded for this committed checkpoint:** the exact command-line (image size, learning
+  rate, batch size, `--balanced-train`). Runs made with the current `train_unified.py` store them under
+  `hyperparameters` in the metrics file.
+- Verification: `sha256sum -c experiments/unified_balanced_paper_01/SHA256SUMS.txt` from the repository root.
+- Whether these weights are redistributed publicly must be decided consistently with `PUBLICATION_SCOPE.md`.

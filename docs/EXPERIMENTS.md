@@ -2755,3 +2755,28 @@ The original computational records
 provide the reference for subsequent
 
 verification and independent reproduction.
+
+
+## 17. Unified 17-Class Model and Hybrid-BN Experiments (added later)
+
+These experiments are separate from the frozen PathMNIST/STARC-9 protocol above.
+Outputs are in `experiments/unified_balanced_paper_01/`.
+
+| Script(s) | Data split | Samples per domain | Purpose |
+|---|---|---|---|
+| `evaluate_unified_cafa_hybrid_val.py`, `cafa_hybrid_validation_alpha_*.json` | validation | 256 | choose Hybrid-BN alpha |
+| `evaluate_cafa_batch_order.py`, `evaluate_cafa_always_on_validation.py`, `evaluate_gated_cafa_validation.py` | validation | **128 evaluated** (pool of 256, second half) | batch-order robustness, always-on CAFA, gated CAFA |
+| `evaluate_shift_detector_*.py` | validation | see JSON | shift detection ROC |
+| `evaluate_unified_cafa_hybrid_final.py` | **test** | full test sets (7,180 / 760) | final clean and shifted comparison (one seed) |
+
+Notes:
+
+- The three 128-sample scripts hard-code the pool of 256 images and ignore `--max-samples`;
+  their JSON `max_samples_per_domain: 256` therefore differs from `samples: 128`.
+- Hybrid-BN alpha is 0.75 for PathMNIST and 0.25 for Kather (chosen on validation, per dataset).
+- The shift is a synthetic brightness/contrast/gamma transform. Different scripts were run with
+  different settings and the numbers must not be compared across JSON files without checking the
+  script that produced them (for example BN-only Kather accuracy is 18.8% in the alpha-sweep
+  files and 77-87% in the batch-order files).
+- No "Hybrid-BN without CAFA updates" or TENT baseline exists for this model, so the effect of CAFA
+  cannot be separated from the effect of mixing BatchNorm statistics.
