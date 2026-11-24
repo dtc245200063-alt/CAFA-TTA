@@ -121,7 +121,7 @@ def eval_domain(name, dataset, base_model, prototypes, args, device):
             dst.eval()
 
 
-    # Experimental hybrid BN: 75% source + 25% target.
+    # Hybrid-BN mixes source and target statistics using alpha: PathMNIST=0.75, Kather=0.25 by default.
     # Preserve BN affine parameters for CAFA adaptation.
     selected_alpha = (args.alpha if args.alpha is not None
                       else (0.75 if name == "pathmnist" else 0.25))
