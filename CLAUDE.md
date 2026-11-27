@@ -15,10 +15,10 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install torch==2.10.0 torchvision==0.25.0 --index-url https://download.pytorch.org/whl/cu128
 python -m pip install -r requirements.txt
-python test_cuda.py
+python scripts/check_cuda.py
 ```
 
-Tests: `pytest` is **not** in `requirements.txt`; install it into the venv first (`python -m pip install pytest`). Run from repo root with `python -m pytest` so the repo root is on `sys.path` (`tests/test_training_utils.py` imports `core.*` without its own path insert).
+Tests: install dev deps with `python -m pip install -r requirements-dev.txt` (adds `pytest`). Run from repo root with `python -m pytest` so the repo root is on `sys.path` (`tests/test_training_utils.py` imports `core.*` without its own path insert).
 
 ```powershell
 python -m pytest
@@ -41,7 +41,7 @@ Docker training (`docker-project/`, README in Vietnamese): `docker compose build
 
 ## Architecture
 
-Layering: `kernel/` (pure loss/math functions) -> `core/` (adapter classes) -> `scripts/` (one entry-point script per experiment). Scripts are standalone and add the repo root to `sys.path` themselves; there is no package install. Several scripts import helpers from `scripts/train_unified.py` by also adding `scripts/` to `sys.path`.
+Layering: `kernel/` (pure loss/math functions) -> `core/` (adapter classes) -> `scripts/` (one entry-point script per experiment). Scripts are standalone and add the repo root to `sys.path` themselves; there is no package install. Several scripts import helpers from `scripts/train_unified.py` by also adding `scripts/` to `sys.path`. `scripts/legacy/` holds superseded v1/v2, BN-only and TENT scripts (their `ROOT` is `parents[2]`); add new entry points to `scripts/`, not there. All `docker-project/*.py` files belong to documented workflows (`Dockerfile`, `Dockerfile.cpu`, `README_CPU.md`).
 
 - `models/feature_extractor.py`: `ResNetFeatureExtractor` wraps a torchvision ResNet and returns `(features[B,512], logits)`. The CAFA adapters require this tuple interface; `kernel/tent.py::TentAdapter` expects a plain model returning only logits.
 - `kernel/confidence.py`: confidence = `1 - H(p)/log(K)` (entropy heuristic, not calibrated). `kernel/feature_alignment.py`: L2-normalized class-mean prototypes and alignment loss.

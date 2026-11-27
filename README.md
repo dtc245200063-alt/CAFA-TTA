@@ -613,7 +613,7 @@ python -m pip install -r requirements.txt
 
 ```bash
 python -m pip check
-python test_cuda.py
+python scripts/check_cuda.py
 ```
 
 Installation in a fresh environment has not yet been independently verified.
@@ -707,7 +707,8 @@ CAFA-TTA/
 |-- core/
 |   |-- cafa_adapter.py
 |   |-- cafa_agreement_adapter.py
-|   `-- cafa_soft_adapter.py
+|   |-- cafa_soft_adapter.py
+|   `-- training_utils.py
 |
 |-- kernel/
 |   |-- confidence.py
@@ -722,7 +723,9 @@ CAFA-TTA/
 |   |-- Prototype extraction
 |   |-- Adaptation evaluation
 |   |-- Statistical analysis
-|   `-- Research figure generation
+|   |-- Research figure generation
+|   |-- check_cuda.py         # Environment check
+|   `-- legacy/               # Superseded v1/v2, BN-only and TENT scripts
 |
 |-- experiments/
 |   |-- reproducibility/
@@ -745,7 +748,7 @@ CAFA-TTA/
 |-- data/                  # Local dataset storage
 |-- checkpoints/           # Local model artifacts
 |-- requirements.txt
-|-- test_cuda.py
+|-- requirements-dev.txt
 |-- .gitignore
 `-- README.md
 ```

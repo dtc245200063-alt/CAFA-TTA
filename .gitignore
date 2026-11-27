@@ -37,12 +37,7 @@ Thumbs.db
 *.bak
 *.bak[0-9]*
 *.tmp
-/data/raw/
-/data/processed/
-/checkpoints/
-/.venv/
 /experiments/starc9_external/_evaluation_work/
-
 
 # Private research artifacts
 /experiments/starc9_external/statistical_analysis/duplicate_group_members.csv
@@ -52,10 +47,4 @@ Thumbs.db
 /CAFA-TTA-ALL-IN-ONE/
 /docker-project/docker_runs/
 /docker-project/external_datasets/
-/docker-project/cafa_cpu_workspace/data/
-/START-CAFA-TTA.bat.backup
-/START-CAFA-TTA.bat.before-path-fix.bak
 /docker-project/cafa_cpu_workspace/
-/; $rule=
-/pace cr-at-eol*
-/"pace cr-at-eol*

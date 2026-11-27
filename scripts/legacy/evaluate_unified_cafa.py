@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import sys as _sys
 from pathlib import Path as _Path
-_sys.path.insert(0, str(_Path(__file__).resolve().parents[1]))
+_sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
 import argparse
 import copy
@@ -89,8 +89,8 @@ def eval_domain(name, dataset, base_model, prototypes, args, device):
                         num_workers=args.workers, drop_last=False)
 
     source = copy.deepcopy(base_model).to(device).eval()
-    # BN-only uses target batch statistics; Source uses source running statistics.
-    # Hybrid-BN interpolates them. CAFA adds online parameter adaptation.
+    # BN-only and CAFA both use current target-batch BN statistics, while
+    # Source uses the original source running statistics. This reveals BN effects.
     bn_only = copy.deepcopy(base_model).to(device)
     wrapped_bn = ResNetFeatureExtractor(bn_only)
     bn_only.requires_grad_(False)
@@ -100,10 +100,6 @@ def eval_domain(name, dataset, base_model, prototypes, args, device):
             module.running_mean = None
             module.running_var = None
     wrapped_bn.train()
-
-    # Hybrid-BN baseline without online adaptation.
-    hybrid_only = copy.deepcopy(base_model).to(device).eval()
-    hybrid_only.requires_grad_(False)
 
     adapted_backbone = copy.deepcopy(base_model).to(device)
     adapter = CAFASoftAdapter(
@@ -124,52 +120,7 @@ def eval_domain(name, dataset, base_model, prototypes, args, device):
             dst.num_batches_tracked = src.num_batches_tracked.detach().clone()
             dst.eval()
 
-
-    # Hybrid-BN mixes source and target statistics using alpha: PathMNIST=0.75, Kather=0.25 by default.
-    # Preserve BN affine parameters for CAFA adaptation.
-    selected_alpha = (args.alpha if args.alpha is not None
-                      else (0.75 if name == "pathmnist" else 0.25))
-    if not 0.0 <= selected_alpha <= 1.0:
-        raise ValueError("Hybrid-BN alpha must be between 0 and 1")
-    from types import MethodType
-
-    def hybrid_bn_forward(bn, x):
-        source_mean = bn.running_mean
-        source_var = bn.running_var
-
-        target_mean = x.detach().mean(dim=(0, 2, 3))
-        target_var = x.detach().var(
-            dim=(0, 2, 3), unbiased=False
-        )
-
-        alpha = selected_alpha
-        mixed_mean = (
-            (1.0 - alpha) * source_mean
-            + alpha * target_mean
-        )
-        mixed_var = (
-            (1.0 - alpha) * source_var
-            + alpha * target_var
-        )
-
-        return torch.nn.functional.batch_norm(
-            x, mixed_mean, mixed_var,
-            bn.weight, bn.bias,
-            training=False, eps=bn.eps
-        )
-
-    for backbone in (hybrid_only, adapted_backbone):
-        for module in backbone.modules():
-            if isinstance(module, torch.nn.BatchNorm2d):
-                module.forward = MethodType(hybrid_bn_forward, module)
-
-    print(f"HYBRID BN: source={1-selected_alpha:.0%}, target={selected_alpha:.0%}", flush=True)
-
-    outcomes = {key: {"true": [], "pred": []} for key in
-                ("source", "bn_only", "hybrid_bn_no_adapt", "cafa_v3_hybrid_bn")}
-    initial_cafa_params = [
-        param.detach().clone() for param in adapter.params
-    ]
+    outcomes = {key: {"true": [], "pred": []} for key in ("source", "bn_only", "cafa_v3_stable_bn")}
     updates, agreements, skipped_singletons = 0, 0, 0
     for step, (x, y) in enumerate(loader, 1):
         # ResNet BN with 1x1 end features cannot train on singleton batches.
@@ -182,104 +133,25 @@ def eval_domain(name, dataset, base_model, prototypes, args, device):
             source_pred = source(x).argmax(1).cpu().tolist()
             _, bn_logits = wrapped_bn(x)
             bn_pred = bn_logits.argmax(1).cpu().tolist()
-            hybrid_pred = hybrid_only(x).argmax(1).cpu().tolist()
         report = adapter.adapt(x)
         with torch.no_grad():
             cafa_pred = adapter.predict(x).argmax(1).cpu().tolist()
         updates += bool(report.get("updated", False))
         agreements += int(report.get("selected", 0))
-        for method, preds in (
-            ("source", source_pred),
-            ("bn_only", bn_pred),
-            ("hybrid_bn_no_adapt", hybrid_pred),
-            ("cafa_v3_hybrid_bn", cafa_pred),
-        ):
+        for method, preds in (("source", source_pred), ("bn_only", bn_pred), ("cafa_v3_stable_bn", cafa_pred)):
             outcomes[method]["true"].extend(truth)
             outcomes[method]["pred"].extend(preds)
         if step % args.log_every == 0 or step == len(loader):
             print(f"{name.upper()} {step}/{len(loader)} batches", flush=True)
 
-    with torch.no_grad():
-        delta_max = max(
-            (param.detach() - initial).abs().max().item()
-            for param, initial in zip(adapter.params, initial_cafa_params)
-        )
-        delta_l2 = sum(
-            (param.detach() - initial).float().square().sum().item()
-            for param, initial in zip(adapter.params, initial_cafa_params)
-        ) ** 0.5
-    print(
-        f"CAFA PARAMETER CHANGE {name}: "
-        f"max_abs={delta_max:.10e}, l2={delta_l2:.10e}",
-        flush=True
-    )
     result = {method: metrics(data["true"], data["pred"], start, end)
               for method, data in outcomes.items()}
     result["adaptation"] = {"updated_batches": updates, "agreement_samples": agreements,
                             "skipped_singleton_samples": skipped_singletons}
-    # Paired correctness comparison: same samples, same batch order.
-    from math import comb
-    truths = outcomes["cafa_v3_hybrid_bn"]["true"]
-    hybrid_preds = outcomes["hybrid_bn_no_adapt"]["pred"]
-    cafa_preds = outcomes["cafa_v3_hybrid_bn"]["pred"]
-
-    both_correct = both_wrong = hybrid_only_correct = cafa_only_correct = 0
-
-    for truth, hp, cp in zip(truths, hybrid_preds, cafa_preds):
-        h = hp == truth
-        c = cp == truth
-        if h and c:
-            both_correct += 1
-        elif h:
-            hybrid_only_correct += 1
-        elif c:
-            cafa_only_correct += 1
-        else:
-            both_wrong += 1
-
-    discordant = hybrid_only_correct + cafa_only_correct
-    if discordant:
-        k = min(hybrid_only_correct, cafa_only_correct)
-        p_exact = min(
-            1.0,
-            2 * sum(comb(discordant, i) for i in range(k + 1))
-            / (2 ** discordant)
-        )
-    else:
-        p_exact = 1.0
-
-    assert (
-        both_correct + both_wrong
-        + hybrid_only_correct + cafa_only_correct
-        == len(truths)
-    )
-
-    result["paired_hybrid_vs_cafa"] = {
-        "both_correct": both_correct,
-        "both_wrong": both_wrong,
-        "hybrid_only_correct": hybrid_only_correct,
-        "cafa_only_correct": cafa_only_correct,
-        "discordant": discordant,
-        "mcnemar_exact_p": p_exact,
-    }
-    print(
-        f"PAIRED AUDIT {name}: "
-        f"Hybrid-only={hybrid_only_correct}, "
-        f"CAFA-only={cafa_only_correct}, "
-        f"McNemar p={p_exact:.8g}",
-        flush=True
-    )
-
-    result["cafa_vs_hybrid_no_adapt_different"] = sum(
-        a != b for a, b in zip(
-            outcomes["cafa_v3_hybrid_bn"]["pred"],
-            outcomes["hybrid_bn_no_adapt"]["pred"]
-        )
-    )
     disagreement = sum(
         a != b for a, b in zip(
             outcomes["bn_only"]["pred"],
-            outcomes["cafa_v3_hybrid_bn"]["pred"]
+            outcomes["cafa_v3_stable_bn"]["pred"]
         )
     )
     for method, data in outcomes.items():
@@ -313,14 +185,9 @@ def main():
     p.add_argument("--lr", type=float, default=1e-4)
     p.add_argument("--lambda-align", type=float, default=0.05)
     p.add_argument("--entropy-floor", type=float, default=0.2)
-    p.add_argument("--alpha", type=float, default=None,
-                   help="Target-statistics weight for Hybrid-BN. Default: per-domain "
-                        "values chosen on validation (PathMNIST 0.75, Kather 0.25).")
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--log-every", type=int, default=4)
     args = p.parse_args()
-    if args.alpha is not None and not 0 <= args.alpha <= 1:
-        p.error("--alpha must be between 0 and 1")
     if args.batch_size < 2 or args.max_samples < 0 or args.log_every < 1:
         p.error("batch-size >= 2, max-samples >= 0, log-every >= 1 are required")
     if args.output.exists():
@@ -349,8 +216,8 @@ def main():
     if norm["mean"] != [0.5]*3 or norm["std"] != [0.5]*3:
         raise ValueError("This shift evaluator expects checkpoint normalization mean/std == 0.5")
     eval_tfm = transforms.Compose([transforms.Resize((size, size)), transforms.ToTensor()])
-    path_test = PathMNISTDataset(args.pathmnist, "val", eval_tfm)
-    kather_test = KatherDataset(splits["val"], eval_tfm)
+    path_test = PathMNISTDataset(args.pathmnist, "test", eval_tfm)
+    kather_test = KatherDataset(splits["test"], eval_tfm)
     model = build_model(len(labels))
     model.load_state_dict(ckpt["model_state_dict"], strict=True)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -358,14 +225,7 @@ def main():
     result = {"metadata": {"checkpoint": args.checkpoint.name, "prototypes": args.prototypes.name,
                            "seed": seed, "labels": labels, "condition": args.condition,
                            "max_samples_per_domain": args.max_samples,
-                           "hybrid_bn_alpha": (args.alpha if args.alpha is not None else
-                                               {"pathmnist": 0.75, "kather": 0.25}),
                            "online_adaptation": True,
-                           "comparison_methods": {
-                               "source": "source running BN statistics",
-                               "bn_only": "target batch BN statistics",
-                               "hybrid_bn_no_adapt": "mixed BN without updates",
-                               "cafa_v3_hybrid_bn": "mixed BN with CAFA updates"},
                            "protocol": "adapt on unlabeled target batch, then predict same batch; reset between datasets",
                            "macro_f1_class_scope": "9 PathMNIST labels or 8 Kather labels"}}
     result["pathmnist"] = eval_domain("pathmnist", path_test, model, prototypes, args, device)
