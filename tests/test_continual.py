@@ -27,6 +27,13 @@ def test_build_transforms_outputs_normalized_tensor(modality):
         assert build_transforms(cfg, train=train)(image).shape == (3, 224, 224)
 
 
+def test_strong_histopathology_augmentation_outputs_normalized_tensor():
+    cfg = resolve_input_config(modality="histopathology", size=224, backbone="resnet18")
+    cfg["augment"] = "strong"
+    image = Image.fromarray(np.random.randint(0, 255, (300, 260, 3), dtype=np.uint8))
+    assert build_transforms(cfg, train=True)(image).shape == (3, 224, 224)
+
+
 def test_fit_temperature_softens_overconfident_logits():
     torch.manual_seed(0)
     labels = torch.randint(0, 3, (300,))

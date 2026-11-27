@@ -141,7 +141,16 @@ def build_transforms(cfg: dict, train: bool) -> transforms.Compose:
     ops: list = [transforms.Resize((size, size))]
     if train:
         modality = cfg.get("modality")
-        if modality == "histopathology":
+        if modality == "histopathology" and cfg.get("augment") == "strong":
+            # Cross-lab robustness: NCT-CRC-HE-100K is Macenko-normalised, so the light
+            # recipe never sees real stain/scanner variety.
+            ops += [
+                transforms.RandomResizedCrop(size, scale=(0.7, 1.0), ratio=(0.9, 1.1)),
+                HEDJitter(alpha=0.2, beta=0.03), RandomRot90(), transforms.RandomHorizontalFlip(),
+                transforms.ColorJitter(brightness=0.25, contrast=0.3, saturation=0.2, hue=0.04),
+                transforms.RandomApply([transforms.GaussianBlur(5, sigma=(0.1, 1.5))], p=0.3),
+            ]
+        elif modality == "histopathology":
             ops += [HEDJitter(), RandomRot90(), transforms.RandomHorizontalFlip()]
         elif modality == "dermatology":
             ops += [

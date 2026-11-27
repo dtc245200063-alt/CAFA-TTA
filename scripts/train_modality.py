@@ -46,15 +46,20 @@ def main(argv=None) -> str:
     parser.add_argument("--registry-root", type=Path, default=ROOT / "models_registry")
     parser.add_argument("--promote", action="store_true",
                         help="Promote the new version even if the registry already has a current one")
+    parser.add_argument("--augment", choices=["light", "strong"], default="light",
+                        help="'strong' adds crop/HED/colour/blur augmentation (histopathology only)")
     parser.add_argument("--notes", default="")
     args = parser.parse_args(argv)
     if args.modality is None or args.data_dir is None:
         parser.error("--modality and --data-dir are required")
+    if args.augment == "strong" and args.modality != "histopathology":
+        parser.error("--augment strong is only defined for histopathology")
 
     cfg = resolve_input_config(
         modality=args.modality, size=args.size, backbone=args.backbone, pretrained=args.pretrained,
         batch_size=args.batch_size, grad_accum=args.grad_accum,
     )
+    cfg["augment"] = args.augment
     seed_everything(args.seed)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -83,7 +88,7 @@ def main(argv=None) -> str:
         prototype_loader=DataLoader(Subset(plain_train, proto_idx), **loader_kw),
         val_loader=DataLoader(val_ds, **loader_kw),
         device=device, training_type="modality", metrics=metrics,
-        extra={"history": history, "data_dir": str(args.data_dir), "seed": args.seed},
+        extra={"history": history, "data_dir": str(args.data_dir), "seed": args.seed, "augment": args.augment},
     )
     if args.output_checkpoint:
         args.output_checkpoint.parent.mkdir(parents=True, exist_ok=True)
