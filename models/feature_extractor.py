@@ -1,29 +1,40 @@
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 
 class ResNetFeatureExtractor(nn.Module):
     """
-    Returns ResNet-18 embeddings and logits.
+    Returns (embeddings, logits) for a torchvision classifier.
 
-    Embeddings: [B, 512]
-    Logits: [B, 9] for PathMNIST
+    Supports ResNet (conv1..layer4, fc) and DenseNet (features, classifier).
+    Embedding size: 512 for ResNet-18, 2048 for ResNet-50, 1024 for DenseNet-121.
+    The name is kept for the many existing callers.
     """
 
     def __init__(self, backbone):
         super().__init__()
-        # Fail at construction, not mid-forward, for non-ResNet backbones (e.g. densenet121).
-        missing = [name for name in ("conv1", "layer4", "fc") if not hasattr(backbone, name)]
-        if missing:
+        if all(hasattr(backbone, name) for name in ("conv1", "layer4", "fc")):
+            self.kind = "resnet"
+        elif all(hasattr(backbone, name) for name in ("features", "classifier")):
+            self.kind = "densenet"
+        else:
             raise ValueError(
-                f"ResNetFeatureExtractor requires a torchvision ResNet; "
-                f"backbone {type(backbone).__name__} lacks {missing}"
+                f"Unsupported backbone {type(backbone).__name__}: "
+                "expected a torchvision ResNet or DenseNet"
             )
         self.backbone = backbone
 
     def forward(self, x):
         model = self.backbone
+
+        if self.kind == "densenet":
+            # Mirrors torchvision DenseNet.forward.
+            x = F.relu(model.features(x), inplace=True)
+            x = F.adaptive_avg_pool2d(x, (1, 1))
+            features = torch.flatten(x, 1)
+            return features, model.classifier(features)
 
         x = model.conv1(x)
         x = model.bn1(x)

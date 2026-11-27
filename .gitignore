@@ -8,6 +8,10 @@ __pycache__/
 # Medical datasets
 data/raw/
 data/processed/
+
+# Continual learning: local experience store (user images) and model registry
+data/experience/
+models_registry/
 *.npz
 *.npy
 

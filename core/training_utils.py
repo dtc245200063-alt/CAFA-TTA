@@ -90,6 +90,63 @@ def load_domain_shift(root: Path) -> dict:
     return DEFAULT_SHIFT
 
 
+class HEDJitter:
+    """Stain augmentation in HED colour space (Tellez et al. 2018) for H&E histopathology."""
+
+    def __init__(self, alpha: float = 0.05, beta: float = 0.01):
+        self.alpha = alpha
+        self.beta = beta
+
+    def __call__(self, image: Image.Image) -> Image.Image:
+        import numpy as np
+        from skimage.color import hed2rgb, rgb2hed
+
+        hed = rgb2hed(np.asarray(image.convert("RGB"), dtype=np.float32) / 255.0)
+        scale = np.random.uniform(1 - self.alpha, 1 + self.alpha, size=3)
+        shift = np.random.uniform(-self.beta, self.beta, size=3)
+        rgb = np.clip(hed2rgb(hed * scale + shift), 0.0, 1.0)
+        return Image.fromarray((rgb * 255).round().astype("uint8"))
+
+
+class RandomRot90:
+    """Rotate by a random multiple of 90 degrees (tissue patches have no canonical orientation)."""
+
+    def __call__(self, image: Image.Image) -> Image.Image:
+        return image.rotate(90 * random.randrange(4))
+
+
+def build_transforms(cfg: dict, train: bool) -> transforms.Compose:
+    """Resize + modality-specific augmentation (train only) + normalization from `resolve_input_config`."""
+    size = cfg["input_size"]
+    ops: list = [transforms.Resize((size, size))]
+    if train:
+        modality = cfg.get("modality")
+        if modality == "histopathology":
+            ops += [HEDJitter(), RandomRot90(), transforms.RandomHorizontalFlip()]
+        elif modality == "dermatology":
+            ops += [
+                transforms.RandomResizedCrop(size, scale=(0.8, 1.0)),
+                transforms.RandomHorizontalFlip(),
+                transforms.RandomVerticalFlip(),
+                transforms.ColorJitter(0.2, 0.2, 0.1, 0.02),
+            ]
+        elif modality == "chest_xray":
+            # No flips: laterality matters on chest radiographs.
+            ops += [transforms.RandomAffine(degrees=7, translate=(0.05, 0.05), scale=(0.95, 1.05))]
+        elif modality == "fundus":
+            ops += [
+                transforms.RandomResizedCrop(size, scale=(0.85, 1.0)),
+                transforms.RandomHorizontalFlip(),
+                transforms.RandomRotation(15),
+                transforms.ColorJitter(0.1, 0.1),
+            ]
+    ops += [
+        transforms.ToTensor(),
+        transforms.Normalize(mean=cfg["normalization"]["mean"], std=cfg["normalization"]["std"]),
+    ]
+    return transforms.Compose(ops)
+
+
 def resolve_input_config(
     modality: str | None,
     size: int | None,
