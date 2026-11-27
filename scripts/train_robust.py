@@ -1,283 +1,211 @@
+"""CAFA-TTA | Stage 3A: Robust Strong-Color-Augmented Fine-Tuning."""
+from __future__ import annotations
 
+import argparse
 import json
-import random
 from pathlib import Path
+import sys
 
-import numpy as np
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-from torchvision import models, transforms
+from torchvision import transforms
 from torchvision.transforms import functional as TF
-from medmnist import PathMNIST
 from tqdm import tqdm
 
-ROOT = Path(__file__).resolve().parents[1]
-
-SEED = 42
-EPOCHS = 8
-BATCH_SIZE = 64
-LR = 5e-5
-
-random.seed(SEED)
-np.random.seed(SEED)
-torch.manual_seed(SEED)
-torch.cuda.manual_seed_all(SEED)
-
-DEVICE = torch.device(
-    "cuda" if torch.cuda.is_available() else "cpu"
+from core.training_utils import (
+    add_common_train_args,
+    build_backbone,
+    default_checkpoint_path,
+    load_domain_shift,
+    load_image_datasets,
+    resolve_input_config,
+    seed_everything,
 )
 
-# Fixed domain shift used in validation experiments
-with open(
-    ROOT / "experiments/domain_shift/metrics.json",
-    encoding="utf-8"
-) as f:
-    shift = json.load(f)["shift"]
+def main() -> None:
+    parser = argparse.ArgumentParser(description="CAFA-TTA Robust Color Training")
+    add_common_train_args(parser, default_epochs=8, default_lr=5e-5)
+    args = parser.parse_args()
 
-normalize = transforms.Normalize(
-    [0.5] * 3,
-    [0.5] * 3
-)
-
-# Randomized color and geometry augmentation
-train_transform = transforms.Compose([
-    transforms.RandomHorizontalFlip(),
-    transforms.RandomVerticalFlip(),
-    transforms.RandomRotation(15),
-    transforms.ColorJitter(
-        brightness=0.35,
-        contrast=0.35,
-        saturation=0.35,
-        hue=0.04,
-    ),
-    transforms.ToTensor(),
-    normalize,
-])
-
-original_transform = transforms.Compose([
-    transforms.ToTensor(),
-    normalize,
-])
-
-def shifted_transform(image):
-    image = TF.adjust_brightness(
-        image, shift["brightness"]
-    )
-    image = TF.adjust_contrast(
-        image, shift["contrast"]
-    )
-    image = TF.adjust_saturation(
-        image, shift["saturation"]
-    )
-    return normalize(TF.to_tensor(image))
-
-data_root = str(ROOT / "data/raw/medmnist")
-
-def make_dataset(split, transform):
-    return PathMNIST(
-        split=split,
-        root=data_root,
-        transform=transform,
-        download=False,
-        size=28,
+    is_legacy = args.modality is None and args.data_dir is None
+    pretrained = False if (is_legacy and "--pretrained" not in sys.argv) else args.pretrained
+    cfg = resolve_input_config(
+        modality=args.modality,
+        size=args.size,
+        backbone=args.backbone,
+        pretrained=pretrained,
+        batch_size=args.batch_size,
+        grad_accum=args.grad_accum,
     )
 
-def make_loader(dataset, shuffle=False):
-    return DataLoader(
-        dataset,
-        batch_size=BATCH_SIZE,
-        shuffle=shuffle,
-        num_workers=0,
-        pin_memory=DEVICE.type == "cuda",
-    )
+    seed_everything(args.seed)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    use_amp = device.type == "cuda"
+    size = cfg["input_size"]
+    mean, std = cfg["normalization"]["mean"], cfg["normalization"]["std"]
+    normalize = transforms.Normalize(mean, std)
+    shift = load_domain_shift(ROOT)
 
-train_loader = make_loader(
-    make_dataset("train", train_transform),
-    shuffle=True,
-)
+    resize_op = [transforms.Resize((size, size))] if (size != 28 or args.data_dir is not None) else []
+    train_transform = transforms.Compose([
+        *resize_op,
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomVerticalFlip(),
+        transforms.RandomRotation(15),
+        transforms.ColorJitter(brightness=0.35, contrast=0.35, saturation=0.35, hue=0.04),
+        transforms.ToTensor(),
+        normalize,
+    ])
+    original_transform = transforms.Compose([*resize_op, transforms.ToTensor(), normalize])
 
-original_loader = make_loader(
-    make_dataset("val", original_transform)
-)
+    def shifted_transform(image):
+        if size != 28 or args.data_dir is not None:
+            image = TF.resize(image, [size, size])
+        image = TF.adjust_brightness(image, shift["brightness"])
+        image = TF.adjust_contrast(image, shift["contrast"])
+        image = TF.adjust_saturation(image, shift["saturation"])
+        return normalize(TF.to_tensor(image))
 
-shifted_loader = make_loader(
-    make_dataset("val", shifted_transform)
-)
+    if args.data_dir is not None:
+        train_ds, orig_val_ds, class_names = load_image_datasets(
+            args.data_dir, train_transform, original_transform, seed=args.seed
+        )
+        _, shifted_val_ds, _ = load_image_datasets(
+            args.data_dir, train_transform, shifted_transform, seed=args.seed
+        )
+    else:
+        from medmnist import PathMNIST
 
-# Initialize using enhanced checkpoint
-model = models.resnet18(weights=None)
-model.fc = nn.Linear(
-    model.fc.in_features, 9
-)
+        data_root = str(ROOT / "data/raw/medmnist")
+        train_ds = PathMNIST(split="train", root=data_root, transform=train_transform, download=False, size=28)
+        orig_val_ds = PathMNIST(split="val", root=data_root, transform=original_transform, download=False, size=28)
+        shifted_val_ds = PathMNIST(split="val", root=data_root, transform=shifted_transform, download=False, size=28)
+        class_names = [f"class_{i}" for i in range(9)]
 
-source_path = (
-    ROOT / "checkpoints/"
-    "resnet18_pathmnist_enhanced_best.pt"
-)
+    num_classes = len(class_names)
+    loader_kw = {"batch_size": cfg["batch_size"], "num_workers": args.num_workers, "pin_memory": use_amp}
+    train_loader = DataLoader(train_ds, shuffle=True, **loader_kw)
+    original_loader = DataLoader(orig_val_ds, shuffle=False, **loader_kw)
+    shifted_loader = DataLoader(shifted_val_ds, shuffle=False, **loader_kw)
 
-checkpoint = torch.load(
-    source_path,
-    map_location="cpu",
-    weights_only=True
-)
+    init_path = args.init_checkpoint or default_checkpoint_path(ROOT, "enhanced", cfg, is_legacy)
+    checkpoint = torch.load(init_path, map_location="cpu", weights_only=True)
+    backbone_name = checkpoint.get("architecture", cfg["backbone"])
 
-model.load_state_dict(
-    checkpoint["model_state_dict"]
-)
-model = model.to(DEVICE)
+    model = build_backbone(backbone_name, num_classes=num_classes, pretrained=False)
+    model.load_state_dict(checkpoint["model_state_dict"])
+    model = model.to(device)
 
-criterion = nn.CrossEntropyLoss()
+    criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=1e-4)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs)
+    scaler = torch.amp.GradScaler("cuda", enabled=use_amp)
 
-optimizer = torch.optim.AdamW(
-    model.parameters(),
-    lr=LR,
-    weight_decay=1e-4,
-)
+    @torch.inference_mode()
+    def evaluate(loader):
+        model.eval()
+        correct = 0
+        total = 0
+        for images, labels in loader:
+            images = images.to(device, non_blocking=True)
+            labels = labels.view(-1).long().to(device, non_blocking=True)
+            with torch.autocast(device_type=device.type, enabled=use_amp):
+                logits = model(images)
+            correct += (logits.argmax(1) == labels).sum().item()
+            total += len(labels)
+        return correct / max(total, 1)
 
-scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-    optimizer,
-    T_max=EPOCHS,
-)
+    output_dir = ROOT / "experiments/robust_training"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    output_checkpoint = args.output_checkpoint or default_checkpoint_path(ROOT, "robust", cfg, is_legacy)
+    output_checkpoint.parent.mkdir(parents=True, exist_ok=True)
 
-use_amp = DEVICE.type == "cuda"
+    print("=" * 60)
+    print("CAFA-TTA | ROBUST COLOR TRAINING")
+    print(f"Device: {device} | AMP: {use_amp} | Init: {init_path}")
+    print(f"Modality: {cfg['modality']} | Size: {size}x{size} | Backbone: {backbone_name}")
+    print(f"Batch: {cfg['batch_size']} x Accum {cfg['grad_accum']} | Epochs: {args.epochs} | LR: {args.lr}")
+    print("=" * 60, flush=True)
 
-scaler = torch.amp.GradScaler(
-    "cuda", enabled=use_amp
-)
+    history = []
+    best_score = -1.0
+    grad_accum = cfg["grad_accum"]
 
-@torch.inference_mode()
-def evaluate(loader):
-    model.eval()
-    correct = 0
-    total = 0
-
-    for images, labels in loader:
-        images = images.to(DEVICE)
-        labels = labels.view(-1).long().to(DEVICE)
-
-        with torch.autocast(
-            device_type=DEVICE.type,
-            enabled=use_amp
-        ):
-            logits = model(images)
-
-        correct += (
-            logits.argmax(1) == labels
-        ).sum().item()
-
-        total += len(labels)
-
-    return correct / total
-
-
-output_dir = ROOT / "experiments/robust_training"
-output_dir.mkdir(parents=True, exist_ok=True)
-
-output_checkpoint = (
-    ROOT / "checkpoints/"
-    "resnet18_pathmnist_robust_best.pt"
-)
-
-# Track original and shifted validation.
-# Selection favors their average.
-history = []
-best_score = -1.0
-
-print("=" * 60)
-print("CAFA-TTA | ROBUST COLOR TRAINING")
-print("Device:", DEVICE)
-print("Epochs:", EPOCHS)
-print("Starting LR:", LR)
-print("Shift:", shift)
-print("=" * 60)
-
-for epoch in range(EPOCHS):
-    model.train()
-
-    running_loss = 0.0
-    correct = 0
-    total = 0
-
-    for images, labels in tqdm(
-        train_loader,
-        desc=f"Epoch {epoch + 1}/{EPOCHS}"
-    ):
-        images = images.to(DEVICE)
-        labels = labels.view(-1).long().to(DEVICE)
-
+    for epoch in range(args.epochs):
+        model.train()
+        running_loss = 0.0
+        correct = 0
+        total = 0
         optimizer.zero_grad(set_to_none=True)
 
-        with torch.autocast(
-            device_type=DEVICE.type,
-            enabled=use_amp
-        ):
-            logits = model(images)
-            loss = criterion(logits, labels)
+        for step, (images, labels) in enumerate(tqdm(train_loader, desc=f"Epoch {epoch + 1}/{args.epochs}"), 1):
+            images = images.to(device, non_blocking=True)
+            labels = labels.view(-1).long().to(device, non_blocking=True)
 
-        scaler.scale(loss).backward()
-        scaler.step(optimizer)
-        scaler.update()
+            with torch.autocast(device_type=device.type, enabled=use_amp):
+                logits = model(images)
+                loss = criterion(logits, labels) / grad_accum
 
-        running_loss += loss.item() * len(labels)
-        correct += (
-            logits.argmax(1) == labels
-        ).sum().item()
-        total += len(labels)
+            scaler.scale(loss).backward()
+            if step % grad_accum == 0 or step == len(train_loader):
+                scaler.step(optimizer)
+                scaler.update()
+                optimizer.zero_grad(set_to_none=True)
 
-    train_loss = running_loss / total
-    train_acc = correct / total
+            running_loss += (loss.item() * grad_accum) * len(labels)
+            correct += (logits.argmax(1) == labels).sum().item()
+            total += len(labels)
 
-    original_acc = evaluate(original_loader)
-    shifted_acc = evaluate(shifted_loader)
+        train_loss = running_loss / max(total, 1)
+        train_acc = correct / max(total, 1)
+        original_acc = evaluate(original_loader)
+        shifted_acc = evaluate(shifted_loader)
+        selection_score = (original_acc + shifted_acc) / 2.0
 
-    selection_score = (
-        original_acc + shifted_acc
-    ) / 2.0
-
-    history.append({
-        "epoch": epoch + 1,
-        "train_loss": train_loss,
-        "train_accuracy": train_acc,
-        "original_val_accuracy": original_acc,
-        "shifted_val_accuracy": shifted_acc,
-        "selection_score": selection_score,
-    })
-
-    print(
-        f"Epoch {epoch + 1}/{EPOCHS} | "
-        f"Train Loss: {train_loss:.4f} | "
-        f"Train Acc: {train_acc:.4f} | "
-        f"Original Val: {original_acc:.4f} | "
-        f"Shifted Val: {shifted_acc:.4f} | "
-        f"Score: {selection_score:.4f}",
-        flush=True,
-    )
-
-    if selection_score > best_score:
-        best_score = selection_score
-
-        torch.save({
-            "model_state_dict": model.state_dict(),
+        history.append({
             "epoch": epoch + 1,
-            "best_val_score": best_score,
+            "train_loss": train_loss,
+            "train_accuracy": train_acc,
             "original_val_accuracy": original_acc,
             "shifted_val_accuracy": shifted_acc,
-            "num_classes": 9,
-            "training_type": "robust_color_finetuning",
-        }, output_checkpoint)
+            "selection_score": selection_score,
+        })
+        print(
+            f"Epoch {epoch + 1}/{args.epochs} | Loss: {train_loss:.4f} | "
+            f"Orig Val: {original_acc:.4f} | Shifted Val: {shifted_acc:.4f} | Score: {selection_score:.4f}",
+            flush=True,
+        )
 
-        print("New best robust checkpoint saved")
+        if selection_score > best_score:
+            best_score = selection_score
+            torch.save(
+                {
+                    "model_state_dict": model.state_dict(),
+                    "epoch": epoch + 1,
+                    "best_score": best_score,
+                    "original_val_acc": original_acc,
+                    "shifted_val_acc": shifted_acc,
+                    "num_classes": num_classes,
+                    "labels": class_names,
+                    "architecture": backbone_name,
+                    "modality": cfg["modality"],
+                    "input_size": size,
+                    "normalization": cfg["normalization"],
+                    "training_type": "robust_color_finetuning",
+                },
+                output_checkpoint,
+            )
 
-    scheduler.step()
+        scheduler.step()
 
-with open(
-    output_dir / "history.json",
-    "w",
-    encoding="utf-8"
-) as f:
-    json.dump(history, f, indent=2)
+    with open(output_dir / "history.json", "w", encoding="utf-8") as f:
+        json.dump(history, f, indent=2)
 
-print("\nROBUST TRAINING COMPLETED")
-print("Best combined validation score:", best_score)
-print("Checkpoint:", output_checkpoint)
+
+if __name__ == "__main__":
+    main()

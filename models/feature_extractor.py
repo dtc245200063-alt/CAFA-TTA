@@ -13,6 +13,13 @@ class ResNetFeatureExtractor(nn.Module):
 
     def __init__(self, backbone):
         super().__init__()
+        # Fail at construction, not mid-forward, for non-ResNet backbones (e.g. densenet121).
+        missing = [name for name in ("conv1", "layer4", "fc") if not hasattr(backbone, name)]
+        if missing:
+            raise ValueError(
+                f"ResNetFeatureExtractor requires a torchvision ResNet; "
+                f"backbone {type(backbone).__name__} lacks {missing}"
+            )
         self.backbone = backbone
 
     def forward(self, x):
