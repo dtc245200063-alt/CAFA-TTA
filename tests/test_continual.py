@@ -126,7 +126,7 @@ def _bn_means(model):
 @pytest.mark.parametrize("accept_all", [True, False])
 def test_session_bn_statistics_follow_stream_but_only_in_distribution_adapts(accept_all):
     torch.manual_seed(0)
-    session = ContinualSession(_tiny_checkpoint(accept_all), batch_size=4, bn_batch=4)
+    session = ContinualSession(_tiny_checkpoint(accept_all), batch_size=4, bn_batch=4, bn_memory_per_class=0)
     source_stats = _bn_means(session.source)
     images = [Image.fromarray(np.random.randint(150, 255, (64, 64, 3), dtype=np.uint8)) for _ in range(8)]
     results = session.predict(images)
@@ -142,8 +142,21 @@ def test_session_bn_statistics_follow_stream_but_only_in_distribution_adapts(acc
     assert all(torch.equal(a, b) for a, b in zip(_bn_means(session.adapter.model), source_stats))
 
 
+def test_session_class_balanced_bn_memory_caps_each_class():
+    torch.manual_seed(0)
+    session = ContinualSession(_tiny_checkpoint(True), batch_size=4, bn_batch=4, bn_memory_per_class=3)
+    source_stats = _bn_means(session.source)
+    session.predict([Image.fromarray(np.random.randint(0, 255, (64, 64, 3), dtype=np.uint8)) for _ in range(20)])
+    assert all(len(bucket) <= 3 for bucket in session.bn_memory)
+    assert sum(len(bucket) for bucket in session.bn_memory) >= 3
+    # 20 images but fewer than 16 in memory: no statistics update yet.
+    if sum(len(bucket) for bucket in session.bn_memory) < 16:
+        assert all(torch.equal(a, b) for a, b in zip(_bn_means(session.reference), source_stats))
+
+
 def test_session_bn_momentum_zero_keeps_source_statistics():
-    session = ContinualSession(_tiny_checkpoint(True), batch_size=4, bn_batch=4, bn_momentum=0.0)
+    session = ContinualSession(_tiny_checkpoint(True), batch_size=4, bn_batch=4, bn_momentum=0.0,
+                               bn_memory_per_class=0)
     source_stats = _bn_means(session.source)
     session.predict([Image.new("RGB", (64, 64), (250, 10, 10))] * 4)
     assert all(torch.allclose(a, b) for a, b in zip(_bn_means(session.reference), source_stats))

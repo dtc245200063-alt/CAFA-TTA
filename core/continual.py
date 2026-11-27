@@ -231,14 +231,23 @@ class ContinualSession:
     `bn_momentum` is the EMA rate of BN statistics per update (0 keeps the source statistics).
     Statistics are updated from `bn_batch` images at a time, independent of `batch_size`:
     within-batch variance of a small batch underestimates the population variance, and
-    8-image updates cost about 1.5 points on clean in-distribution data. Statistics are updated from every buffered image: the OOD gate cannot reliably
-    tell shifted tissue from non-tissue images, and blocking shifted tissue would stop the session
-    from ever adapting to it. Gradient updates and the experience store stay gated.
+    8-image updates cost about 1.5 points on clean in-distribution data. Statistics are updated
+    from every buffered image: the OOD gate cannot reliably tell shifted tissue from non-tissue
+    images, and blocking shifted tissue would stop the session from ever adapting to it.
+    Gradient updates and the experience store stay gated.
+
+    With `bn_memory_per_class` > 0 (default), statistics are computed from a memory holding the
+    latest images of each predicted class instead of the latest `bn_batch` images
+    (category-balanced memory as in RoTTA, Yuan et al. CVPR 2023), so a run of one tissue class
+    does not drag the statistics towards that class. An update still happens every `bn_batch`
+    new images. On a class-ordered clean CRC-VAL-HE-7K stream this kept accuracy at 95.4%
+    versus 84.9% with plain recent-image statistics (R1 model, 3 seeds). 0 restores the latter.
     """
 
     def __init__(self, checkpoint: dict, device="cpu", *, adapt: bool = True, batch_size: int = 8,
                  lr: float = 1e-4, lambda_align: float = 0.05, entropy_floor: float = 0.2,
-                 bn_momentum: float = 0.1, bn_batch: int = 64, monitor: CollapseMonitor | None = None):
+                 bn_momentum: float = 0.1, bn_batch: int = 64, bn_memory_per_class: int = 8,
+                 monitor: CollapseMonitor | None = None):
         self.device = torch.device(device)
         self.labels = list(checkpoint["labels"])
         self.temperature = float(checkpoint.get("temperature", 1.0))
@@ -249,6 +258,7 @@ class ContinualSession:
         self.batch_size = batch_size
         self.bn_momentum = bn_momentum
         self.bn_batch = bn_batch
+        self.bn_memory_per_class = bn_memory_per_class
         self.adapter_kwargs = {"lr": lr, "lambda_align": lambda_align, "entropy_floor": entropy_floor}
         self.monitor = monitor or CollapseMonitor()
         self.source = ResNetFeatureExtractor(build_model_from_checkpoint(checkpoint)).to(self.device).eval()
@@ -274,8 +284,30 @@ class ContinualSession:
                     module.momentum = self.bn_momentum
         self.pending: list[torch.Tensor] = []
         self.stats_pending: list[torch.Tensor] = []
+        self.bn_memory = [deque(maxlen=self.bn_memory_per_class) for _ in self.labels]
+        self.bn_new = 0
         self.updates = 0
         self.monitor.clear()
+
+    def _update_statistics(self, x: torch.Tensor, ref_pred: torch.Tensor) -> None:
+        batches = []
+        if self.bn_memory_per_class > 0:
+            for image, c in zip(x, ref_pred.tolist()):
+                self.bn_memory[c].append(image)
+            self.bn_new += len(x)
+            if self.bn_new >= self.bn_batch:
+                self.bn_new = 0
+                memory = [image for bucket in self.bn_memory for image in bucket]
+                if len(memory) >= 16:
+                    batches.append(torch.stack(memory))
+        else:
+            self.stats_pending.extend(x)
+            while len(self.stats_pending) >= self.bn_batch:
+                batches.append(torch.stack(self.stats_pending[:self.bn_batch]))
+                self.stats_pending = self.stats_pending[self.bn_batch:]
+        for batch in batches:
+            update_bn_statistics(self.adapter.model, batch)
+            update_bn_statistics(self.reference, batch)
 
     def reset(self) -> None:
         """Discard all online adaptation and return to the source weights and statistics."""
@@ -305,12 +337,7 @@ class ContinualSession:
 
         reset = False
         if self.adapt_enabled:
-            self.stats_pending.extend(x)
-            while len(self.stats_pending) >= self.bn_batch:
-                batch = torch.stack(self.stats_pending[:self.bn_batch])
-                self.stats_pending = self.stats_pending[self.bn_batch:]
-                update_bn_statistics(self.adapter.model, batch)
-                update_bn_statistics(self.reference, batch)
+            self._update_statistics(x, ref_logits.argmax(1))
             self.pending.extend(x[i] for i in range(len(x)) if not ood[i])
             while len(self.pending) >= self.batch_size:
                 batch = torch.stack(self.pending[:self.batch_size])

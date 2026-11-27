@@ -89,16 +89,17 @@ class Evaluator:
         return x
 
     @torch.no_grad()
-    def forward(self, model, x: torch.Tensor):
+    def forward(self, model, images: list[Image.Image], shifted: bool = False):
+        """Preprocess in chunks so the whole set never sits in memory as float tensors."""
         model.eval()
         feats, logits = [], []
-        for i in range(0, len(x), 256):
-            f, l = model(x[i:i + 256].to(self.device))
+        for i in range(0, len(images), 256):
+            f, l = model(self.tensors(images[i:i + 256], shifted).to(self.device))
             feats.append(f.float()), logits.append(l.float())
         return torch.cat(feats), torch.cat(logits)
 
-    def static_report(self, x: torch.Tensor, y: torch.Tensor) -> dict:
-        f, l = self.forward(self.source, x)
+    def static_report(self, images: list[Image.Image], y: torch.Tensor, shifted: bool = False) -> dict:
+        f, l = self.forward(self.source, images, shifted)
         m = classification_metrics(l.cpu(), y, len(self.labels))
         present = sorted(set(y.tolist()))
         return {"n": len(y), "accuracy": round(m["accuracy"], 4), "macro_f1_present_classes": round(float(
@@ -108,8 +109,11 @@ class Evaluator:
                 "ece_raw": ece(torch.softmax(l, 1).cpu(), y),
                 "ood_flag_rate": round(float(self.gate.is_ood(f, l, self.protos).float().mean()), 4)}
 
-    def stream(self, method: str, images: list[Image.Image], y: np.ndarray, seed: int) -> dict:
+    def stream(self, method: str, images: list[Image.Image], y: np.ndarray, seed: int,
+               class_ordered: bool = False) -> dict:
         order = np.random.default_rng(seed).permutation(len(y))
+        if class_ordered:  # one tissue class after another (label-correlated, non-i.i.d. stream)
+            order = order[np.argsort(y[order], kind="stable")]
         session = adapter = model = None
         if method == "source":
             model = self.source
@@ -121,7 +125,9 @@ class Evaluator:
             model.train()
         elif method == "cafa_v3":
             adapter = CAFASoftAdapter(copy.deepcopy(self.source), self.protos)
-        elif method == "session_b8":
+        elif method == "session_b8_recent":  # BN statistics from the most recent images only
+            session = ContinualSession(self.ck, self.device, batch_size=8, bn_memory_per_class=0)
+        elif method == "session_b8":  # default: class-balanced BN statistics memory
             session = ContinualSession(self.ck, self.device, batch_size=8)
         preds = []
         for i in range(0, len(order), STREAM_BATCH):
@@ -169,6 +175,10 @@ def main(argv=None) -> dict:
                         help="Folder containing crc_val_he_7k/ and kather2016/")
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--skip-stream", action="store_true", help="Only static CRC-VAL and OOD checks")
+    parser.add_argument("--orders", default="iid,class",
+                        help="Comma list of Kather stream orders: iid (shuffled) and/or class (class-ordered)")
+    parser.add_argument("--methods", default="source,bn_adapt,cafa_v3,session_b8_recent,session_b8")
+    parser.add_argument("--skip-crc", action="store_true", help="Skip CRC-VAL (saves ~1 GB RAM)")
     args = parser.parse_args(argv)
 
     registry = ModelRegistry(args.registry_root, "histopathology")
@@ -180,37 +190,47 @@ def main(argv=None) -> dict:
               "temperature": ev.T, "val_metrics": ck.get("metrics")}
 
     t0 = time.time()
+    if not args.skip_crc:
+        _crc(args, ev, labels, result)
+    _kather_and_synthetic(args, ev, labels, result, version, t0)
+    return result
+
+
+def _crc(args, ev, labels, result):
     crc_imgs, crc_y = load_folder(args.data_root / "crc_val_he_7k", lambda n: labels.index(n) if n in labels else None)
     y = torch.from_numpy(crc_y)
-    result["crc_val_clean"] = ev.static_report(ev.tensors(crc_imgs), y)
-    result["crc_val_colour_shift"] = ev.static_report(ev.tensors(crc_imgs, shifted=True), y)
-    del crc_imgs
+    result["crc_val_clean"] = ev.static_report(crc_imgs, y)
+    result["crc_val_colour_shift"] = ev.static_report(crc_imgs, y, shifted=True)
 
+
+def _kather_and_synthetic(args, ev, labels, result, version, t0):
     kat_imgs, kat_y = load_folder(args.data_root / "kather2016",
                                   lambda n: labels.index(KATHER_TO_NCT[n]) if n in KATHER_TO_NCT else None)
-    result["kather2016_source_static"] = ev.static_report(ev.tensors(kat_imgs), torch.from_numpy(kat_y))
-    if not args.skip_stream:
-        result["kather2016_stream"] = {}
-        for method in ("source", "bn_adapt", "cafa_v3", "session_b8"):
-            runs = [ev.stream(method, kat_imgs, kat_y, s) for s in SEEDS]
+    result["kather2016_source_static"] = ev.static_report(kat_imgs, torch.from_numpy(kat_y))
+    for order in [] if args.skip_stream else args.orders.split(","):
+        key = "kather2016_stream" if order == "iid" else "kather2016_stream_class_ordered"
+        result[key] = {}
+        for method in args.methods.split(","):
+            runs = [ev.stream(method, kat_imgs, kat_y, s, class_ordered=order == "class") for s in SEEDS]
             accs = [r["accuracy"] for r in runs]
-            result["kather2016_stream"][method] = {"acc_mean": round(float(np.mean(accs)), 4),
-                                                   "acc_std": round(float(np.std(accs)), 4), "runs": runs}
-            print(f"[{version}] kather stream {method:10s} {np.mean(accs):.4f} ± {np.std(accs):.4f}", flush=True)
+            result[key][method] = {"acc_mean": round(float(np.mean(accs)), 4),
+                                   "acc_std": round(float(np.std(accs)), 4), "runs": runs}
+            print(f"[{version}] kather {order:5s} {method:12s} {np.mean(accs):.4f} ± {np.std(accs):.4f}", flush=True)
 
     synth = synthetic_non_tissue()
-    f, l = ev.forward(ev.source, ev.tensors(synth))
+    f, l = ev.forward(ev.source, synth)
     flag = ev.gate.is_ood(f, l, ev.protos).cpu()
     result["synthetic_non_tissue_rejected"] = round(float(flag.float().mean()), 3)
     result["elapsed_s"] = round(time.time() - t0)
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(result, indent=2), encoding="utf-8")
-    c, s = result["crc_val_clean"], result["crc_val_colour_shift"]
-    print(f"[{version}] CRC-VAL clean {c['accuracy']:.4f} (ECE {c['ece_temperature_scaled']}) | shift {s['accuracy']:.4f} | "
-          f"Kather static {result['kather2016_source_static']['accuracy']:.4f} | "
+    if "crc_val_clean" in result:
+        c, s = result["crc_val_clean"], result["crc_val_colour_shift"]
+        print(f"[{version}] CRC-VAL clean {c['accuracy']:.4f} (ECE {c['ece_temperature_scaled']}) | "
+              f"shift {s['accuracy']:.4f}", flush=True)
+    print(f"[{version}] Kather static {result['kather2016_source_static']['accuracy']:.4f} | "
           f"non-tissue rejected {result['synthetic_non_tissue_rejected']}", flush=True)
-    return result
 
 
 if __name__ == "__main__":

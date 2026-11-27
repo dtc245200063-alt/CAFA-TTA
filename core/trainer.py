@@ -126,11 +126,15 @@ def train_classifier(
     use_amp = torch.device(device).type == "cuda"
     targets = dataset_targets(train_ds)
     sampler = balanced_sampler(targets) if balanced else None
+    # Keep training workers alive across epochs: on Windows each respawn re-imports torch.
+    # Validation gets few, short-lived workers: each Windows worker commits ~1.8 GB.
+    worker_kw = {"persistent_workers": True} if num_workers > 0 else {}
     train_loader = DataLoader(
         train_ds, batch_size=batch_size, shuffle=sampler is None, sampler=sampler,
-        num_workers=num_workers, pin_memory=use_amp, drop_last=len(train_ds) > batch_size,
+        num_workers=num_workers, pin_memory=use_amp, drop_last=len(train_ds) > batch_size, **worker_kw,
     )
-    val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers)
+    val_loader = DataLoader(val_ds, batch_size=batch_size * 2, shuffle=False,
+                            num_workers=min(num_workers, 2), pin_memory=use_amp)
 
     model = model.to(device)
     if teacher is not None:
