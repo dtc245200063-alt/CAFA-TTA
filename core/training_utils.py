@@ -74,6 +74,26 @@ MODALITY_PROFILES: dict[str, ModalityProfile] = {
         micro_batch_4gb=8,
         grad_accum_4gb=8,
     ),
+    # Blood-smear cell crops (e.g. BloodMNIST+ at 224).
+    "hematology": ModalityProfile(
+        name="hematology",
+        min_size=96,
+        optimal_size=224,
+        max_size=384,
+        default_backbone="resnet18",
+        micro_batch_4gb=16,
+        grad_accum_4gb=4,
+    ),
+    # Grayscale breast ultrasound (e.g. BreastMNIST+ at 224).
+    "breast_ultrasound": ModalityProfile(
+        name="breast_ultrasound",
+        min_size=128,
+        optimal_size=224,
+        max_size=384,
+        default_backbone="resnet18",
+        micro_batch_4gb=16,
+        grad_accum_4gb=4,
+    ),
 }
 
 SUPPORTED_BACKBONES = ("resnet18", "resnet50", "densenet121")
@@ -133,6 +153,16 @@ def build_transforms(cfg: dict, train: bool) -> transforms.Compose:
         elif modality == "chest_xray":
             # No flips: laterality matters on chest radiographs.
             ops += [transforms.RandomAffine(degrees=7, translate=(0.05, 0.05), scale=(0.95, 1.05))]
+        elif modality == "hematology":
+            # Isolated cells: orientation-free; mild colour jitter for stain variation.
+            ops += [RandomRot90(), transforms.RandomHorizontalFlip(), transforms.ColorJitter(0.1, 0.1, 0.1, 0.02)]
+        elif modality == "breast_ultrasound":
+            # Grayscale: gain/contrast variation and small geometric changes only.
+            ops += [
+                transforms.RandomAffine(degrees=10, translate=(0.05, 0.05), scale=(0.9, 1.1)),
+                transforms.RandomHorizontalFlip(),
+                transforms.ColorJitter(brightness=0.15, contrast=0.15),
+            ]
         elif modality == "fundus":
             ops += [
                 transforms.RandomResizedCrop(size, scale=(0.85, 1.0)),

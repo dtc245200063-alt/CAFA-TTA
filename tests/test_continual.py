@@ -17,7 +17,9 @@ from core.trainer import fit_temperature, train_classifier
 from core.training_utils import build_transforms, resolve_input_config
 
 
-@pytest.mark.parametrize("modality", ["histopathology", "dermatology", "chest_xray", "fundus"])
+@pytest.mark.parametrize(
+    "modality", ["histopathology", "dermatology", "chest_xray", "fundus", "hematology", "breast_ultrasound"]
+)
 def test_build_transforms_outputs_normalized_tensor(modality):
     cfg = resolve_input_config(modality=modality, size=224, backbone="resnet18")
     image = Image.fromarray(np.random.randint(0, 255, (300, 260, 3), dtype=np.uint8))
