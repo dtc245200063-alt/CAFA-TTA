@@ -710,9 +710,11 @@ An experimental extension, separate from the frozen research pipeline, explores 
 ```bash
 python scripts/train_modality.py --modality histopathology --data-dir <ImageFolder>
 python -m pip install -r requirements-demo.txt
-python app/demo_gradio.py
+python app/demo_gradio.py --data-root <folder with kather2016/ and crc_val_he_7k/>
 python scripts/consolidate.py --modality histopathology --source-data-dir <ImageFolder>
 ```
+
+The demo has three tabs: image analysis, a labelled live test that streams a class-balanced subset of Kather 2016 or CRC-VAL-HE-7K through source / BN-adapt / CAFA v3 / the session (shuffled or class-ordered; labels used only for scoring), and saved results from `scripts/evaluate_histopathology_external.py` (`--results-dir`, default `runs/overnight`).
 
 This extension has only been smoke-tested on synthetic data. It has not been evaluated on the research datasets, and none of the results reported above use it.
 

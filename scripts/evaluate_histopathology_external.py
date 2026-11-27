@@ -110,7 +110,7 @@ class Evaluator:
                 "ood_flag_rate": round(float(self.gate.is_ood(f, l, self.protos).float().mean()), 4)}
 
     def stream(self, method: str, images: list[Image.Image], y: np.ndarray, seed: int,
-               class_ordered: bool = False) -> dict:
+               class_ordered: bool = False, keep_predictions: bool = False) -> dict:
         order = np.random.default_rng(seed).permutation(len(y))
         if class_ordered:  # one tissue class after another (label-correlated, non-i.i.d. stream)
             order = order[np.argsort(y[order], kind="stable")]
@@ -147,6 +147,8 @@ class Evaluator:
                           for c in sorted(set(true.tolist()))}}
         if session is not None:
             out.update(updates=session.updates, resets=session.resets)
+        if keep_predictions:
+            out.update(order=order.tolist(), predictions=preds.tolist())
         return out
 
 

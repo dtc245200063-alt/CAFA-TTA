@@ -212,3 +212,40 @@ def test_end_to_end_train_session_consolidate_rollback(tmp_path):
     assert consolidate.main(consolidate_args + ["--max-macro-f1-drop", "1", "--max-class-recall-drop", "1"]) == "v2"
     assert registry.current_version() == "v2"
     assert consolidate.main(common + ["--rollback"]) == "v1"
+
+
+def test_live_test_comparison_and_results_frame(tmp_path):
+    import json
+    from app.live_test import results_frame, run_comparison
+
+    for name, colour in (("01_TUMOR", (90, 30, 120)), ("07_ADIPOSE", (230, 200, 220))):
+        (tmp_path / "kather" / name).mkdir(parents=True)
+        for i in range(6):
+            Image.new("RGB", (64, 64), colour).save(tmp_path / "kather" / name / f"{i}.tif")
+    summary, recall, gallery = run_comparison(_tiny_checkpoint(True), tmp_path / "kather", 8,
+                                              ["source", "session_b8"], class_ordered=True)
+    assert list(summary["Phương pháp"]) == ["source", "session_b8"]
+    assert set(recall["Lớp"]) == {"ADI", "TUM"} and len(gallery) == 4
+
+    (tmp_path / "v1.json").write_text(json.dumps({"version": "v1", "architecture": "resnet18",
+                                                  "crc_val_clean": {"accuracy": 0.9},
+                                                  "synthetic_non_tissue_rejected": 0.5}))
+    (tmp_path / "v1_static.json").write_text("{}")
+    frame = results_frame(tmp_path)
+    assert set(frame["Giá trị (%)"]) == {90.0, 50.0}
+
+
+def test_pair_comparer_table_has_both_images(tmp_path):
+    from app.live_test import PairComparer
+
+    for name, colour in (("01_TUMOR", (90, 30, 120)), ("07_ADIPOSE", (230, 200, 220))):
+        (tmp_path / "kather2016" / name).mkdir(parents=True)
+        for i in range(4):
+            Image.new("RGB", (64, 64), colour).save(tmp_path / "kather2016" / name / f"{i}.tif")
+    comparer = PairComparer(tmp_path, warmup=8)
+    ck = _tiny_checkpoint(True)
+    image = comparer.random_image("kather2016", "TUM", ck["labels"], seed=0)
+    params, probs = comparer.compare("v1", ck, [("A", image, "kather2016", "TUM"),
+                                                ("B", image, "kather2016", None)])
+    assert list(params.columns) == ["Thông số", "A", "B"]
+    assert params["B"][1].startswith("không rõ") and len(probs) == 2 * 2 * 2
