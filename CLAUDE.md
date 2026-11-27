@@ -52,6 +52,23 @@ Layering: `kernel/` (pure loss/math functions) -> `core/` (adapter classes) -> `
 - Evaluation is online batch-prequential: predict each batch, then adapt on it. Target labels are never used for adaptation. Adapters mutate the model in place, so evaluators deep-copy/reload the source model per run/seed.
 - `core/training_utils.py` (newer, shared by `train_*.py` and `docker-project/docker_train.py`): modality profiles (histopathology/dermatology/chest_xray/fundus) that set input size, backbone, and 4 GB batch/grad-accum defaults; `add_common_train_args` defines the shared CLI (`--modality`, `--size`, `--backbone`, `--data-dir`, `--init-checkpoint`, `--output-checkpoint`, ...). Omitting `--modality`/`--data-dir` gives legacy 28px PathMNIST behavior. Note `ResNetFeatureExtractor` only supports ResNet backbones, not `densenet121`.
 
+## Continual-learning line (multi-modality, 224 px)
+
+Separate from the frozen research pipeline above; it never writes `checkpoints/` or `experiments/`.
+
+```powershell
+python scripts/train_modality.py --modality histopathology --data-dir <ImageFolder>   # registers v1
+python -m pip install -r requirements-demo.txt
+python app/demo_gradio.py                                                             # http://127.0.0.1:7860
+python scripts/consolidate.py --modality histopathology --source-data-dir <ImageFolder>
+python scripts/consolidate.py --modality histopathology --rollback
+```
+
+- `core/trainer.py`: generic loop (label smoothing, warmup+cosine, EMA with warmup, class-balanced sampler, optional distillation) and temperature scaling.
+- `core/continual.py`: `ContinualSession` runs CAFA-TTA v3 with source BN statistics frozen (`StableBNFeatures`), adapts only on buffered batches of in-distribution images, and resets to source when `CollapseMonitor` sees drift. `OODGate` (energy + prototype similarity, calibrated on val) decides what may be learned from; confidence alone is not enough (an untrained-domain image can get confidence 1.0). `ExperienceStore` keeps pixel-hashed PNGs + `records.jsonl` under `data/experience/<modality>/`. `build_checkpoint` packages weights with temperature, prototypes and OOD thresholds.
+- `core/registry.py`: `models_registry/<modality>/vN/model.pt` + `registry.json`; loads with `weights_only=True`. `passes_gate` compares candidate vs current on the same fixed split; consolidation promotes only on pass and logs every attempt to `consolidation_log.jsonl`.
+- `data/experience/` and `models_registry/` are gitignored (user images stay local). The demo binds to 127.0.0.1 only.
+
 ## Research-integrity constraints
 
 - `experiments/` holds frozen research outputs (predictions, tables, figures, manifests) referenced by docs and hash manifests (`experiments/reproducibility/`, `experiments/research_outputs/research_manifest.json`, `experiments/starc9_external/external_protocol.json`). Run new experiments into a separate output directory; do not overwrite these files.

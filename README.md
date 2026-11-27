@@ -699,6 +699,25 @@ The commands above document the intended execution workflow rather than a certif
 
 ---
 
+## Continual Learning Extension (Experimental)
+
+An experimental extension, separate from the frozen research pipeline, explores continual learning across modalities (histopathology, dermatology, chest X-ray, fundus) at 224x224.
+
+- Online: during a demo session, CAFA-TTA v3 adapts BatchNorm affine parameters on buffered batches, with source BatchNorm statistics kept fixed.
+- Safety: images flagged out-of-distribution (energy score and prototype similarity) are never learned from, and the session resets to the source model when its predictions drift.
+- Persistent: user-confirmed labels and capped, confident pseudo-labels are consolidated offline with source-data replay and distillation. A new model version is promoted only if it does not regress on a fixed validation split, and earlier versions can be restored.
+
+```bash
+python scripts/train_modality.py --modality histopathology --data-dir <ImageFolder>
+python -m pip install -r requirements-demo.txt
+python app/demo_gradio.py
+python scripts/consolidate.py --modality histopathology --source-data-dir <ImageFolder>
+```
+
+This extension has only been smoke-tested on synthetic data. It has not been evaluated on the research datasets, and none of the results reported above use it.
+
+---
+
 ## Repository Structure
 
 ```text
@@ -708,7 +727,13 @@ CAFA-TTA/
 |   |-- cafa_adapter.py
 |   |-- cafa_agreement_adapter.py
 |   |-- cafa_soft_adapter.py
-|   `-- training_utils.py
+|   |-- training_utils.py
+|   |-- trainer.py            # Continual line: training loop, calibration
+|   |-- continual.py          # Online session, OOD gate, experience store
+|   `-- registry.py           # Model versions, promotion gate, rollback
+|
+|-- app/
+|   `-- demo_gradio.py        # Continual-learning demo (local only)
 |
 |-- kernel/
 |   |-- confidence.py
