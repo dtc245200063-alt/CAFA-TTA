@@ -703,7 +703,7 @@ The commands above document the intended execution workflow rather than a certif
 
 An experimental extension, separate from the frozen research pipeline, explores continual learning across modalities (histopathology, dermatology, chest X-ray, fundus) at 224x224.
 
-- Online: during a demo session, CAFA-TTA v3 adapts BatchNorm affine parameters on buffered batches, with source BatchNorm statistics kept fixed.
+- Online: during a demo session, BatchNorm running statistics follow the incoming images by EMA (starting from source), and CAFA-TTA v3 adapts BatchNorm affine parameters on buffered batches of images that pass the OOD gate. In one internal check (R1 model, Kather 2016 stream, 3 shuffled-order seeds) this raised accuracy from 32% to about 64% with no material change on clean CRC-VAL-HE-7K; it is not validated on class-ordered or clinical streams.
 - Safety: images flagged out-of-distribution (energy score and prototype similarity) are never learned from, and the session resets to the source model when its predictions drift.
 - Persistent: user-confirmed labels and capped, confident pseudo-labels are consolidated offline with source-data replay and distillation. A new model version is promoted only if it does not regress on a fixed validation split, and earlier versions can be restored.
 

@@ -1,10 +1,13 @@
 """Hybrid continual learning: safe online adaptation plus an experience store.
 
-Online (per session): `ContinualSession` wraps CAFA-TTA v3 (`CAFASoftAdapter`) with
-source BatchNorm statistics kept fixed, so single images are predicted stably and
-only BN affine parameters adapt, on buffered batches of in-distribution images.
-Out-of-distribution images are flagged and never used. If the adapted model drifts
-from the source model or becomes much more overconfident, it is reset to source.
+Online (per session): `ContinualSession` wraps CAFA-TTA v3 (`CAFASoftAdapter`).
+BatchNorm layers always normalise with running statistics, so single images are
+predicted stably. Those statistics start at the source values and follow the target
+stream by EMA over buffered batches (RoTTA-style robust BN); this is what recovers most
+accuracy under stain/scanner shift. BN affine parameters additionally adapt with CAFA,
+but only on in-distribution images. A reference model that only tracks the BN statistics
+judges OOD and collapse; if CAFA's updates drift from it or become much more
+overconfident, the session is reset to source.
 
 Persistent learning happens offline in `scripts/consolidate.py`, from the records
 saved by `ExperienceStore`, behind an evaluation gate (`core/registry.py`).
@@ -88,7 +91,7 @@ class OODGate:
 
 
 class CollapseMonitor:
-    """Detect harmful drift of the adapted model, judged against the frozen source model."""
+    """Detect harmful drift of the adapted model, judged against a reference model."""
 
     def __init__(self, window: int = 64, min_count: int = 16,
                  max_disagreement: float = 0.3, min_entropy_ratio: float = 0.5):
@@ -198,7 +201,10 @@ def build_checkpoint(model: nn.Module, *, labels: list[str], cfg: dict, prototyp
 
 
 class StableBNFeatures(ResNetFeatureExtractor):
-    """Keep source BatchNorm statistics during adaptation (BN layers always in eval mode)."""
+    """BN layers always normalise with running statistics (eval mode), also during adaptation.
+
+    The running statistics change only through `update_bn_statistics`.
+    """
 
     def train(self, mode: bool = True):
         super().train(mode)
@@ -208,12 +214,31 @@ class StableBNFeatures(ResNetFeatureExtractor):
         return self
 
 
+def update_bn_statistics(model: nn.Module, x: torch.Tensor) -> None:
+    """EMA-update BN running statistics from one batch (no gradients, no parameter change)."""
+    bns = [m for m in model.modules() if isinstance(m, nn.BatchNorm2d)]
+    with torch.no_grad():
+        for m in bns:
+            m.train()
+        model(x)
+        for m in bns:
+            m.eval()
+
+
 class ContinualSession:
-    """Online CAFA-TTA v3 session for one modality model from the registry."""
+    """Online CAFA-TTA v3 session for one modality model from the registry.
+
+    `bn_momentum` is the EMA rate of BN statistics per update (0 keeps the source statistics).
+    Statistics are updated from `bn_batch` images at a time, independent of `batch_size`:
+    within-batch variance of a small batch underestimates the population variance, and
+    8-image updates cost about 1.5 points on clean in-distribution data. Statistics are updated from every buffered image: the OOD gate cannot reliably
+    tell shifted tissue from non-tissue images, and blocking shifted tissue would stop the session
+    from ever adapting to it. Gradient updates and the experience store stay gated.
+    """
 
     def __init__(self, checkpoint: dict, device="cpu", *, adapt: bool = True, batch_size: int = 8,
                  lr: float = 1e-4, lambda_align: float = 0.05, entropy_floor: float = 0.2,
-                 monitor: CollapseMonitor | None = None):
+                 bn_momentum: float = 0.1, bn_batch: int = 64, monitor: CollapseMonitor | None = None):
         self.device = torch.device(device)
         self.labels = list(checkpoint["labels"])
         self.temperature = float(checkpoint.get("temperature", 1.0))
@@ -222,6 +247,8 @@ class ContinualSession:
         self.preprocess = eval_transform(checkpoint)
         self.adapt_enabled = adapt
         self.batch_size = batch_size
+        self.bn_momentum = bn_momentum
+        self.bn_batch = bn_batch
         self.adapter_kwargs = {"lr": lr, "lambda_align": lambda_align, "entropy_floor": entropy_floor}
         self.monitor = monitor or CollapseMonitor()
         self.source = ResNetFeatureExtractor(build_model_from_checkpoint(checkpoint)).to(self.device).eval()
@@ -239,12 +266,19 @@ class ContinualSession:
                 dst.running_mean = src.running_mean.detach().clone()
                 dst.running_var = src.running_var.detach().clone()
                 dst.num_batches_tracked = src.num_batches_tracked.detach().clone()
+        # Reference: source weights + the same BN statistics updates, but no gradient updates.
+        self.reference = copy.deepcopy(self.source).eval()
+        for model in (self.adapter.model, self.reference):
+            for module in model.modules():
+                if isinstance(module, nn.BatchNorm2d):
+                    module.momentum = self.bn_momentum
         self.pending: list[torch.Tensor] = []
+        self.stats_pending: list[torch.Tensor] = []
         self.updates = 0
         self.monitor.clear()
 
     def reset(self) -> None:
-        """Discard all online adaptation and return to the source weights."""
+        """Discard all online adaptation and return to the source weights and statistics."""
         self._build_adapter()
         self.resets += 1
 
@@ -255,9 +289,10 @@ class ContinualSession:
 
     def predict(self, images: list[Image.Image]) -> list[dict]:
         x = torch.stack([self.preprocess(img.convert("RGB")) for img in images]).to(self.device)
-        src_features, src_logits = self._forward(self.source, x)
+        _, src_logits = self._forward(self.source, x)
+        ref_features, ref_logits = self._forward(self.reference, x)
         features, logits = self._forward(self.adapter.model, x)
-        ood = self.gate.is_ood(src_features, src_logits, self.prototypes)
+        ood = self.gate.is_ood(ref_features, ref_logits, self.prototypes)
         probs = torch.softmax(logits / self.temperature, dim=1)
         pred = probs.argmax(1)
         proto_pred = (F.normalize(features.float(), dim=1) @ self.prototypes.T).argmax(1)
@@ -265,12 +300,18 @@ class ContinualSession:
 
         keep = ~ood
         if keep.any():
-            self.monitor.update(pred[keep], src_pred[keep],
-                                normalized_entropy(logits[keep]), normalized_entropy(src_logits[keep]))
+            self.monitor.update(pred[keep], ref_logits[keep].argmax(1),
+                                normalized_entropy(logits[keep]), normalized_entropy(ref_logits[keep]))
 
         reset = False
-        if self.adapt_enabled and keep.any():
-            self.pending.extend(x[keep])
+        if self.adapt_enabled:
+            self.stats_pending.extend(x)
+            while len(self.stats_pending) >= self.bn_batch:
+                batch = torch.stack(self.stats_pending[:self.bn_batch])
+                self.stats_pending = self.stats_pending[self.bn_batch:]
+                update_bn_statistics(self.adapter.model, batch)
+                update_bn_statistics(self.reference, batch)
+            self.pending.extend(x[i] for i in range(len(x)) if not ood[i])
             while len(self.pending) >= self.batch_size:
                 batch = torch.stack(self.pending[:self.batch_size])
                 self.pending = self.pending[self.batch_size:]
@@ -296,11 +337,14 @@ class ContinualSession:
 
     def save_state(self, path: Path | str) -> None:
         torch.save({"model": self.adapter.model.state_dict(),
+                    "reference": self.reference.state_dict(),
                     "optimizer": self.adapter.optimizer.state_dict(),
                     "updates": self.updates}, path)
 
     def load_state(self, path: Path | str) -> None:
         state = torch.load(path, map_location=self.device, weights_only=True)
         self.adapter.model.load_state_dict(state["model"])
+        if "reference" in state:
+            self.reference.load_state_dict(state["reference"])
         self.adapter.optimizer.load_state_dict(state["optimizer"])
         self.updates = int(state["updates"])

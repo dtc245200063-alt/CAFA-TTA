@@ -101,6 +101,47 @@ def test_experience_store_dedups_and_strips_metadata(tmp_path):
     assert len(list(store.images.iterdir())) == 1
 
 
+def _tiny_checkpoint(accept_all: bool) -> dict:
+    from torchvision.models import resnet18
+
+    gate = (float("inf"), float("-inf")) if accept_all else (float("-inf"), float("inf"))
+    return {"model_state_dict": resnet18(num_classes=2).state_dict(), "labels": ["ADI", "TUM"],
+            "architecture": "resnet18", "modality": "histopathology", "input_size": 64,
+            "normalization": {"mean": [0.5] * 3, "std": [0.5] * 3}, "temperature": 1.0,
+            "prototypes": torch.randn(2, 512),
+            "ood": {"energy_threshold": gate[0], "similarity_threshold": gate[1], "temperature": 1.0}}
+
+
+def _bn_means(model):
+    return [m.running_mean.clone() for m in model.modules() if isinstance(m, torch.nn.BatchNorm2d)]
+
+
+@pytest.mark.parametrize("accept_all", [True, False])
+def test_session_bn_statistics_follow_stream_but_only_in_distribution_adapts(accept_all):
+    torch.manual_seed(0)
+    session = ContinualSession(_tiny_checkpoint(accept_all), batch_size=4, bn_batch=4)
+    source_stats = _bn_means(session.source)
+    images = [Image.fromarray(np.random.randint(150, 255, (64, 64, 3), dtype=np.uint8)) for _ in range(8)]
+    results = session.predict(images)
+
+    assert all(r["ood"] is (not accept_all) for r in results)
+    # Statistics move away from source in both cases; the source model itself never changes.
+    for model in (session.adapter.model, session.reference):
+        assert any(not torch.allclose(a, b) for a, b in zip(_bn_means(model), source_stats))
+    assert all(torch.equal(a, b) for a, b in zip(_bn_means(session.source), source_stats))
+    # Gradient updates only from in-distribution images.
+    assert (session.updates > 0) is accept_all
+    session.reset()
+    assert all(torch.equal(a, b) for a, b in zip(_bn_means(session.adapter.model), source_stats))
+
+
+def test_session_bn_momentum_zero_keeps_source_statistics():
+    session = ContinualSession(_tiny_checkpoint(True), batch_size=4, bn_batch=4, bn_momentum=0.0)
+    source_stats = _bn_means(session.source)
+    session.predict([Image.new("RGB", (64, 64), (250, 10, 10))] * 4)
+    assert all(torch.allclose(a, b) for a, b in zip(_bn_means(session.reference), source_stats))
+
+
 def _make_imagefolder(root: Path, per_class: int = 10, size: int = 96) -> None:
     rng = np.random.default_rng(0)
     for name, colour in (("ADI", (230, 200, 220)), ("TUM", (90, 30, 120))):
