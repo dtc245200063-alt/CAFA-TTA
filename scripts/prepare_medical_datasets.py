@@ -24,6 +24,8 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import time
+import urllib.error
 import urllib.request
 import zipfile
 
@@ -84,14 +86,43 @@ KAGGLE_DATASETS = {
 }
 
 
-def _download_file(url: str, dest: Path) -> None:
+def _download_file(url: str, dest: Path, retries: int = 30, wait: float = 5.0) -> None:
+    """Download to `<dest>.part`, resuming with HTTP Range after drops; rename only when complete."""
     dest.parent.mkdir(parents=True, exist_ok=True)
     if dest.is_file():
         print(f"[SKIP] Already downloaded: {dest}", flush=True)
         return
+    part = dest.with_name(dest.name + ".part")
     print(f"[DOWNLOAD] {url} -> {dest}", flush=True)
-    urllib.request.urlretrieve(url, dest)
-    print(f"[DONE] {dest} ({dest.stat().st_size / 1024**2:.1f} MB)", flush=True)
+    for attempt in range(1, retries + 1):
+        have = part.stat().st_size if part.exists() else 0
+        request = urllib.request.Request(url, headers={"Range": f"bytes={have}-"} if have else {})
+        try:
+            with urllib.request.urlopen(request, timeout=120) as resp:
+                if have and resp.status != 206:  # server ignored the range: start over
+                    have = 0
+                length = resp.headers.get("Content-Length")
+                total = have + int(length) if length is not None else None
+                with open(part, "ab" if have else "wb") as f:
+                    shutil.copyfileobj(resp, f, 8 * 1024 * 1024)
+        except urllib.error.HTTPError as err:
+            if err.code == 416 and have:  # requested range starts at the end: already complete
+                total = have
+            else:
+                raise
+        except (urllib.error.URLError, TimeoutError, ConnectionError, OSError) as err:
+            print(f"[RETRY {attempt}/{retries}] {type(err).__name__}: {err} "
+                  f"({part.stat().st_size / 1024**2:.0f} MB so far)", flush=True)
+            time.sleep(wait * min(attempt, 12))
+            continue
+        size = part.stat().st_size
+        if total is None or size == total:
+            part.replace(dest)
+            print(f"[DONE] {dest} ({size / 1024**2:.1f} MB)", flush=True)
+            return
+        print(f"[RETRY {attempt}/{retries}] incomplete: {size} of {total} bytes", flush=True)
+        time.sleep(wait * min(attempt, 12))
+    raise RuntimeError(f"Download failed after {retries} attempts; partial file kept at {part}")
 
 
 def _extract_zip(zip_path: Path, out_dir: Path) -> None:

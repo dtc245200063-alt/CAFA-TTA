@@ -94,3 +94,44 @@ def test_chestmnist_is_not_exportable():
     assert all(v["flag"] != "chestmnist" for v in pmd.MEDMNIST_DATASETS.values())
     with pytest.raises(KeyError):
         pmd.export_medmnist("chestmnist_224", Path("unused"))
+
+
+class _FakeResponse:
+    def __init__(self, data: bytes, status: int, fail_after: int | None = None):
+        self.data, self.status, self.pos, self.fail_after = data, status, 0, fail_after
+        self.headers = {"Content-Length": str(len(data))}
+
+    def read(self, n=-1):
+        if self.fail_after is not None and self.pos >= self.fail_after:
+            raise ConnectionResetError("connection dropped")
+        end = len(self.data) if n < 0 else self.pos + n
+        if self.fail_after is not None:
+            end = min(end, self.fail_after)
+        chunk, self.pos = self.data[self.pos:end], end
+        return chunk
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+
+def test_download_resumes_after_drop_and_only_renames_when_complete(tmp_path, monkeypatch):
+    payload = bytes(range(256)) * 40
+    calls = []
+
+    def fake_urlopen(request, timeout=None):
+        start = int(request.headers.get("Range", "bytes=0-")[6:-1])
+        calls.append(start)
+        if len(calls) == 1:  # first attempt drops mid-way
+            return _FakeResponse(payload, 200, fail_after=3000)
+        return _FakeResponse(payload[start:], 206)
+
+    monkeypatch.setattr(pmd.urllib.request, "urlopen", fake_urlopen)
+    dest = tmp_path / "data.zip"
+    pmd._download_file("https://example.invalid/data.zip", dest, wait=0)
+
+    assert calls == [0, 3000]
+    assert dest.read_bytes() == payload
+    assert not (tmp_path / "data.zip.part").exists()
