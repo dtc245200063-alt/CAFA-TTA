@@ -701,22 +701,33 @@ The commands above document the intended execution workflow rather than a certif
 
 ## Continual Learning Extension (Experimental)
 
-An experimental extension, separate from the frozen research pipeline, explores continual learning across modalities (histopathology, dermatology, chest X-ray, fundus) at 224x224.
+An experimental extension, separate from the frozen research pipeline, explores continual learning across modalities (histopathology, dermatology, chest X-ray, fundus, hematology, breast ultrasound) at 224x224. It never writes `checkpoints/` or `experiments/`.
 
-- Online: during a demo session, BatchNorm running statistics follow the incoming images by EMA (starting from source), and CAFA-TTA v3 adapts BatchNorm affine parameters on buffered batches of images that pass the OOD gate. In one internal check (R1 model, Kather 2016 stream, 3 shuffled-order seeds) this raised accuracy from 32% to about 64% with no material change on clean CRC-VAL-HE-7K; it is not validated on class-ordered or clinical streams.
-- Safety: images flagged out-of-distribution (energy score and prototype similarity) are never learned from, and the session resets to the source model when its predictions drift.
+- Online: during a session, BatchNorm running statistics follow the incoming images by EMA from a class-balanced memory (latest images per predicted class, RoTTA-style), and CAFA-TTA v3 adapts BatchNorm affine parameters on buffered batches of images that pass the OOD gate.
+- Safety: images flagged out-of-distribution (energy score and prototype similarity) are never learned from by gradient, and the session resets to the source model when its predictions drift.
 - Persistent: user-confirmed labels and capped, confident pseudo-labels are consolidated offline with source-data replay and distillation. A new model version is promoted only if it does not regress on a fixed validation split, and earlier versions can be restored.
 
 ```bash
-python scripts/train_modality.py --modality histopathology --data-dir <ImageFolder>
+python scripts/train_modality.py --modality histopathology --data-dir <ImageFolder> --augment strong
 python -m pip install -r requirements-demo.txt
 python app/demo_gradio.py --data-root <folder with kather2016/ and crc_val_he_7k/>
 python scripts/consolidate.py --modality histopathology --source-data-dir <ImageFolder>
 ```
 
-The demo has three tabs: image analysis, a labelled live test that streams a class-balanced subset of Kather 2016 or CRC-VAL-HE-7K through source / BN-adapt / CAFA v3 / the session (shuffled or class-ordered; labels used only for scoring), and saved results from `scripts/evaluate_histopathology_external.py` (`--results-dir`, default `runs/overnight`).
+Evaluation scripts (outputs go to `runs/`, which is gitignored):
 
-This extension has only been smoke-tested on synthetic data. It has not been evaluated on the research datasets, and none of the results reported above use it.
+| Script | What it measures |
+| --- | --- |
+| `scripts/evaluate_histopathology_external.py` | CRC-VAL-HE-7K (clean and colour-shifted), Kather 2016 static and online streams (shuffled and class-ordered, 3 seeds), synthetic non-tissue rejection |
+| `scripts/build_showcase.py` | Image-by-image before/after on Kather 2016 (first model vs current model with adaptation) |
+| `scripts/continual_resnet.py` | Consolidation rounds from unlabelled Kather 2016 patients 01, 03, 05, 06, 07, 09; scored on patients 02, 04, 08, 10, which are never used for learning |
+| `scripts/extract_foundation_features.py`, `scripts/evaluate_foundation.py`, `scripts/continual_foundation.py` | Comparison with a frozen pathology foundation model (Phikon, ViT-B/16) plus a linear head, feature-level TTA (class-balanced statistics, T3A) and the same consolidation protocol |
+
+Kather 2016 is scored two ways. Strict scoring counts the NCT classes MUC (mucus) and MUS (smooth muscle) as errors, because Kather 2016 has no such classes. Harmonised scoring follows the Kather 2016 class definitions (Sci Rep 6:27988), where "debris" includes necrosis, haemorrhage and mucus and "simple stroma" includes smooth muscle, so MUC counts as DEB and MUS as STR. Both are reported. Kather 2016 is one external dataset; seeds are paired, not independent runs; the class-ordered stream is simulated by sorting labels, not real cases; nothing here is clinically validated.
+
+The demo (`app/demo_gradio.py`, bound to 127.0.0.1) has tabs for the before/after showcase, the consolidation rounds, single-image analysis, a side-by-side two-image comparison, a labelled live test of source / BN-adapt / CAFA v3 / the session, and the saved results (`--results-dir`, default `runs/final`).
+
+The Phikon weights (owkin/phikon, Owkin non-commercial licence, research use only) are downloaded separately into `data/foundation/phikon/` and are never committed.
 
 ---
 

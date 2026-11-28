@@ -23,7 +23,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from core.registry import ModelRegistry  # noqa: E402
-from evaluate_histopathology_external import KATHER_TO_NCT, Evaluator, load_folder  # noqa: E402
+from evaluate_histopathology_external import HARMONISED, KATHER_TO_NCT, Evaluator, harmonised_accuracy, load_folder  # noqa: E402
 
 
 def predictions(ev: Evaluator, images, y) -> dict:
@@ -72,24 +72,29 @@ def main(argv=None):
         f"{after} + tự thích nghi": after_p["adapted"],
     }
     acc = {k: float((v == y).mean()) for k, v in results.items()}
-    for k, v in acc.items():
-        print(f"{k:28s} {100 * v:.1f}%")
+    acc_h = {k: harmonised_accuracy(v, y, labels) for k, v in results.items()}
+    for k in acc:
+        print(f"{k:28s} strict {100 * acc[k]:.1f}% | harmonised {100 * acc_h[k]:.1f}%")
 
     args.out.mkdir(parents=True, exist_ok=True)
     records = [{"path": str(p), "true": labels[t], **{k: labels[v[i]] for k, v in results.items()}}
                for i, (p, t) in enumerate(zip(paths, y))]
     (args.out / "showcase.json").write_text(json.dumps(
-        {"before": args.before, "after": after, "accuracy": acc, "labels": labels, "images": records},
+        {"before": args.before, "after": after, "accuracy": acc, "accuracy_harmonised": acc_h, "labels": labels,
+         "images": records},
         ensure_ascii=False, indent=1), encoding="utf-8")
-    render(args.out, labels, y, results, images)
+    render(args.out, labels, y, results, images, acc_h)
 
 
-def render(out: Path, labels, y, results, images):
+def render(out: Path, labels, y, results, images, acc_h):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
     keys = list(results)
+    strict_results = results
+    to_h = np.array([labels.index(HARMONISED.get(n, n)) for n in labels])
+    results = {k: to_h[v] for k, v in results.items()}  # per-class and confusion use harmonised labels
     classes = sorted(set(y.tolist()))
     names = [labels[c] for c in classes]
     colours = ["#9aa0a6", "#4c8bf5", "#e8590c"]
@@ -97,10 +102,19 @@ def render(out: Path, labels, y, results, images):
     fig = plt.figure(figsize=(15, 10))
     grid = fig.add_gridspec(2, 3, height_ratios=[1, 1.15], hspace=0.45, wspace=0.3)
     ax = fig.add_subplot(grid[0, :])
-    accs = [100 * (results[k] == y).mean() for k in keys]
-    bars = ax.barh(keys[::-1], accs[::-1], color=colours[::-1])
-    ax.bar_label(bars, fmt="%.1f%%", fontsize=16, fontweight="bold", padding=6)
+    rows = np.arange(len(keys))[::-1]
+    strict = [100 * (strict_results[k] == y).mean() for k in keys]
+    harm = [100 * acc_h[k] for k in keys]
+    bars = ax.barh(rows + 0.2, strict, 0.38, color=colours, alpha=0.55, label="Chấm nghiêm ngặt")
+    ax.bar_label(bars, fmt="%.1f%%", fontsize=11, padding=4)
+    bars = ax.barh(rows - 0.2, harm, 0.38, color=colours, label="Chấm theo định nghĩa lớp của Kather 2016")
+    ax.bar_label(bars, fmt="%.1f%%", fontsize=15, fontweight="bold", padding=4)
+    ax.set_yticks(rows, keys)
     ax.set_xlim(0, 100)
+    from matplotlib.patches import Patch
+    ax.legend(handles=[Patch(color="#555", alpha=0.55, label="Chấm nghiêm ngặt (MUC, MUS tính là sai)"),
+                       Patch(color="#555", label="Chấm theo định nghĩa lớp của Kather 2016 (debris gồm chất nhầy, stroma gồm cơ trơn)")],
+              loc="lower center", bbox_to_anchor=(0.5, -0.32), ncol=2, fontsize=9, frameon=False)
     ax.set_title(f"Độ chính xác trên Kather 2016 (ảnh từ phòng lab khác, {len(y):,} ảnh, {len(set(y.tolist()))} loại mô)",
                  fontsize=14, loc="left")
     ax.tick_params(labelsize=12)
@@ -113,7 +127,7 @@ def render(out: Path, labels, y, results, images):
         ax.bar(np.arange(len(classes)) + (k - 1) * width, rec, width, color=colours[k], label=key)
     ax.set_xticks(np.arange(len(classes)), names)
     ax.set_ylim(0, 105)
-    ax.set_title("Tỷ lệ nhận đúng theo loại mô (%)", loc="left")
+    ax.set_title("Tỷ lệ nhận đúng theo loại mô (%), chấm theo Kather 2016", loc="left", fontsize=10)
     ax.legend(fontsize=8, loc="upper left", bbox_to_anchor=(0, -0.1), ncol=1, frameon=False)
     ax.spines[["top", "right"]].set_visible(False)
 
@@ -135,7 +149,7 @@ def render(out: Path, labels, y, results, images):
     plt.close(fig)
 
     # Rescued examples: wrong before, right after; 3 per class.
-    first, last = results[keys[0]], results[keys[-1]]
+    first, last = strict_results[keys[0]], strict_results[keys[-1]]
     per_class = {c: np.flatnonzero((y == c) & (first != c) & (last == c))[:3] for c in classes}
     fig, axes = plt.subplots(3, len(classes), figsize=(2.3 * len(classes), 9.6),
                              gridspec_kw={"hspace": 0.55, "wspace": 0.08})

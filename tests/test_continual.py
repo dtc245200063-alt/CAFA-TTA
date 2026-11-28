@@ -249,3 +249,22 @@ def test_pair_comparer_table_has_both_images(tmp_path):
                                                 ("B", image, "kather2016", None)])
     assert list(params.columns) == ["Thông số", "A", "B"]
     assert params["B"][1].startswith("không rõ") and len(probs) == 2 * 2 * 2
+
+
+def test_registry_save_retries_transient_permission_error(tmp_path, monkeypatch):
+    import core.registry as reg
+
+    calls = {"n": 0}
+    real_replace = reg.os.replace
+
+    def flaky_replace(src, dst):
+        calls["n"] += 1
+        if calls["n"] < 3:
+            raise PermissionError("locked by another process")
+        return real_replace(src, dst)
+
+    monkeypatch.setattr(reg.os, "replace", flaky_replace)
+    monkeypatch.setattr(reg.time, "sleep", lambda _: None)
+    registry = ModelRegistry(tmp_path, "histopathology")
+    registry.promote(registry.register({"w": torch.ones(1), "metrics": {}}))
+    assert registry.current_version() == "v1" and calls["n"] >= 3

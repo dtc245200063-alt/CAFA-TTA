@@ -52,3 +52,7 @@ Thumbs.db
 /docker-project/docker_runs/
 /docker-project/external_datasets/
 /docker-project/cafa_cpu_workspace/
+
+# Downloaded foundation-model weights (licensed separately, never committed)
+data/foundation/
+*.safetensors

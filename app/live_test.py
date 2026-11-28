@@ -8,6 +8,7 @@ methods in the same online batch-prequential protocol as
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -23,7 +24,12 @@ for p in (ROOT, ROOT / "scripts"):
 
 from evaluate_histopathology_external import KATHER_TO_NCT, Evaluator  # noqa: E402
 
-DATASETS = {"Kather 2016 (phòng lab khác)": "kather2016", "CRC-VAL-HE-7K (cùng nguồn, độc lập)": "crc_val_he_7k"}
+DATASETS = {"Kather 2016 (phòng lab khác)": "kather2016",
+            "Kather 2016, nhóm B (bệnh nhân 02, 04, 08, 10)": "kather2016#B",
+            "CRC-VAL-HE-7K (cùng nguồn, độc lập)": "crc_val_he_7k"}
+# Kather 2016 patients used, unlabelled, by the continual-learning rounds (scripts/continual_resnet.py).
+# Group B never is, so it is the fair test set for a consolidated model.
+KATHER_GROUP_B = {"02", "04", "08", "10"}
 METHODS = {"Không thích nghi": "source", "BN-adapt": "bn_adapt", "CAFA v3 gốc": "cafa_v3",
            "Session mới (bộ nhớ cân bằng)": "session_b8"}
 SHORT = {"source": "Gốc", "bn_adapt": "BN", "cafa_v3": "CAFA", "session_b8": "Session"}  # gallery captions
@@ -31,10 +37,19 @@ ORDERS = {"Xáo trộn": False, "Theo ca (từng loại mô liên tiếp)": True
 
 
 def labelled_paths(folder: Path, labels: list[str]) -> list[tuple[Path, int]]:
-    """(path, label index) for an ImageFolder whose class names are NCT or Kather 2016 names."""
+    """(path, label index) for an ImageFolder whose class names are NCT or Kather 2016 names.
+
+    A folder named `kather2016#B` means Kather 2016 restricted to patient group B.
+    """
+    folder = Path(folder)
+    group_b = folder.name.endswith("#B")
+    if group_b:
+        folder = folder.with_name(folder.name[:-2])
     out = []
     for p in sorted(folder.glob("*/*")):
         if p.suffix.lower() not in {".tif", ".tiff", ".png", ".jpg", ".jpeg"}:
+            continue
+        if group_b and (re.search(r"HE-(\d+)", p.name) or [None, ""])[1] not in KATHER_GROUP_B:
             continue
         name = KATHER_TO_NCT.get(p.parent.name, p.parent.name)
         if name in labels:
@@ -74,6 +89,7 @@ def run_comparison(checkpoint: dict, folder: Path, n: int, methods: list[str], c
         r = ev.stream(method, images, y, seed, class_ordered=class_ordered, keep_predictions=True)
         preds[method] = dict(zip(r["order"], r["predictions"]))
         summary.append({"Phương pháp": method, "Độ chính xác (%)": round(100 * r["accuracy"], 1),
+                        "Chấm theo định nghĩa lớp Kather 2016 (%)": round(100 * r["accuracy_harmonised"], 1),
                         "Cập nhật online": r.get("updates", "-"), "Reset": r.get("resets", "-")})
         recall += [{"Phương pháp": method, "Lớp": c, "Recall (%)": round(100 * v, 1)} for c, v in r["recall"].items()]
 
@@ -183,14 +199,15 @@ class PairComparer:
         return pd.DataFrame({"Thông số": rows, **table}), pd.DataFrame(probs)
 
 
-RESULT_ROWS = [  # (label, key path in the evaluator JSON); every value is a fraction
+RESULT_ROWS = [  # (label, key path in the evaluator JSON); every value is a fraction. "K16" = Kather 2016 class definitions
     ("CRC-VAL sạch", ("crc_val_clean", "accuracy")),
     ("CRC-VAL lệch màu", ("crc_val_colour_shift", "accuracy")),
-    ("Kather, không thích nghi", ("kather2016_source_static", "accuracy")),
-    ("Kather xáo trộn, CAFA v3 gốc", ("kather2016_stream", "cafa_v3", "acc_mean")),
-    ("Kather xáo trộn, Session mới", ("kather2016_stream", "session_b8", "acc_mean")),
-    ("Kather theo ca, CAFA v3 gốc", ("kather2016_stream_class_ordered", "cafa_v3", "acc_mean")),
-    ("Kather theo ca, Session mới", ("kather2016_stream_class_ordered", "session_b8", "acc_mean")),
+    ("Kather, không thích nghi (nghiêm ngặt)", ("kather2016_source_static", "accuracy")),
+    ("Kather, không thích nghi (K16)", ("kather2016_source_static", "accuracy_harmonised")),
+    ("Kather xáo trộn, CAFA v3 gốc (K16)", ("kather2016_stream", "cafa_v3", "acc_harmonised_mean")),
+    ("Kather xáo trộn, Session mới (K16)", ("kather2016_stream", "session_b8", "acc_harmonised_mean")),
+    ("Kather theo ca, CAFA v3 gốc (K16)", ("kather2016_stream_class_ordered", "cafa_v3", "acc_harmonised_mean")),
+    ("Kather theo ca, Session mới (K16)", ("kather2016_stream_class_ordered", "session_b8", "acc_harmonised_mean")),
     ("Ảnh không phải mô bị chặn", ("synthetic_non_tissue_rejected",)),
 ]
 

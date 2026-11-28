@@ -39,6 +39,15 @@ from models.feature_extractor import ResNetFeatureExtractor  # noqa: E402
 KATHER_TO_NCT = {"01_TUMOR": "TUM", "02_STROMA": "STR", "04_LYMPHO": "LYM", "05_DEBRIS": "DEB",
                  "06_MUCOSA": "NORM", "07_ADIPOSE": "ADI", "08_EMPTY": "BACK"}
 STREAM_BATCH, SEEDS = 64, (0, 1, 2)
+# Kather 2016 class definitions (Sci Rep 6:27988): "debris" includes necrosis, haemorrhage and mucus;
+# "simple stroma" includes smooth muscle. Harmonised scoring counts NCT MUC as DEB and MUS as STR.
+# Strict scoring (the default `accuracy`) counts them as errors. Both are reported.
+HARMONISED = {"MUC": "DEB", "MUS": "STR"}
+
+
+def harmonised_accuracy(pred, true, labels) -> float:
+    pred = np.asarray([labels.index(HARMONISED.get(labels[p], labels[p])) for p in np.asarray(pred).tolist()])
+    return float((pred == np.asarray(true)).mean())
 
 
 def colour_shift(x01: torch.Tensor) -> torch.Tensor:
@@ -102,7 +111,9 @@ class Evaluator:
         f, l = self.forward(self.source, images, shifted)
         m = classification_metrics(l.cpu(), y, len(self.labels))
         present = sorted(set(y.tolist()))
-        return {"n": len(y), "accuracy": round(m["accuracy"], 4), "macro_f1_present_classes": round(float(
+        return {"n": len(y), "accuracy": round(m["accuracy"], 4),
+                "accuracy_harmonised": round(harmonised_accuracy(l.argmax(1).cpu(), y, self.labels), 4),
+                "macro_f1_present_classes": round(float(
                     np.mean([_f1(l.argmax(1).cpu(), y, c) for c in present])), 4),
                 "per_class_recall": {self.labels[c]: round(m["per_class_recall"][c], 3) for c in present},
                 "ece_temperature_scaled": ece(torch.softmax(l / self.T, 1).cpu(), y),
@@ -143,6 +154,7 @@ class Evaluator:
                 adapter.adapt(x)
         preds, true = np.array(preds), y[order]
         out = {"accuracy": float((preds == true).mean()),
+               "accuracy_harmonised": harmonised_accuracy(preds, true, self.labels),
                "recall": {self.labels[c]: round(float((preds[true == c] == c).mean()), 3)
                           for c in sorted(set(true.tolist()))}}
         if session is not None:
@@ -216,7 +228,9 @@ def _kather_and_synthetic(args, ev, labels, result, version, t0):
             runs = [ev.stream(method, kat_imgs, kat_y, s, class_ordered=order == "class") for s in SEEDS]
             accs = [r["accuracy"] for r in runs]
             result[key][method] = {"acc_mean": round(float(np.mean(accs)), 4),
-                                   "acc_std": round(float(np.std(accs)), 4), "runs": runs}
+                                   "acc_std": round(float(np.std(accs)), 4),
+                                   "acc_harmonised_mean": round(float(np.mean([r["accuracy_harmonised"] for r in runs])), 4),
+                                   "runs": runs}
             print(f"[{version}] kather {order:5s} {method:12s} {np.mean(accs):.4f} ± {np.std(accs):.4f}", flush=True)
 
     synth = synthetic_non_tissue()

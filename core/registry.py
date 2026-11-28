@@ -8,6 +8,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import json
 import os
+import time
 from pathlib import Path
 
 import torch
@@ -44,7 +45,16 @@ class ModelRegistry:
         self.dir.mkdir(parents=True, exist_ok=True)
         tmp = self.index_path.with_suffix(".json.tmp")
         tmp.write_text(json.dumps(index, indent=2), encoding="utf-8")
-        os.replace(tmp, self.index_path)
+        # On Windows, a scanner or editor briefly holding registry.json makes os.replace fail with
+        # PermissionError; retry instead of losing a promotion.
+        for attempt in range(10):
+            try:
+                os.replace(tmp, self.index_path)
+                return
+            except PermissionError:
+                if attempt == 9:
+                    raise
+                time.sleep(0.2 * (attempt + 1))
 
     def versions(self) -> dict:
         return self._load()["versions"]

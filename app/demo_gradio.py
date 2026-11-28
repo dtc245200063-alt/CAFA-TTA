@@ -113,6 +113,10 @@ def build_ui(backend: DemoBackend, data_root: Path | None = None, results_dir: P
         if (showcase / "showcase.json").is_file():
             with gr.Tab("Điểm nổi bật: trước và sau"):
                 _showcase_tab(gr, showcase)
+        continual = Path(results_dir or "").parent / "continual_resnet" / "history.json"
+        if continual.is_file():
+            with gr.Tab("Học liên tục"):
+                _continual_tab(gr, continual)
         with gr.Tab("Demo: phân tích ảnh"):
             _analysis_tab(gr, backend, modalities, data_root)
         if "histopathology" in modalities and data_root and Path(data_root).is_dir():
@@ -159,11 +163,18 @@ def _showcase_tab(gr, folder: Path):
     acc = {k: 100 * v for k, v in data["accuracy"].items()}
     rescued = [r for r in data["images"] if r[first] != r["true"] and r[last] == r["true"]]
     broken = [r for r in data["images"] if r[first] == r["true"] and r[last] != r["true"]]
+    harm = {k: 100 * v for k, v in data.get("accuracy_harmonised", {}).items()}
+    headline = harm or acc
     gr.Markdown(
         f"## Kather 2016: ảnh từ một phòng lab khác, mô hình chưa từng thấy\n"
-        f"# {acc[first]:.1f}% → {acc[keys[1]]:.1f}% → **{acc[last]:.1f}%**\n"
-        f"*{first}* → *{keys[1]}* → *{last}*. Trên {len(data['images']):,} ảnh có "
-        f"**{len(rescued):,} ảnh từ sai thành đúng** và {len(broken):,} ảnh từ đúng thành sai. "
+        f"# {headline[first]:.1f}% → {headline[keys[1]]:.1f}% → **{headline[last]:.1f}%**\n"
+        f"*{first}* → *{keys[1]}* → *{last}*"
+        + (f", chấm theo định nghĩa lớp của Kather 2016 (debris gồm chất nhầy, simple stroma gồm cơ trơn). "
+           f"Chấm nghiêm ngặt (MUC, MUS tính là sai): {acc[first]:.1f}% → {acc[keys[1]]:.1f}% → {acc[last]:.1f}%. "
+           if harm else ". ")
+        + "Phần tự thích nghi ở đây là một lần chạy (thứ tự xáo trộn, seed 0); bảng kết quả dùng trung bình 3 seed. "
+        + f"Trên {len(data['images']):,} ảnh có **{len(rescued):,} ảnh từ sai thành đúng** và "
+        f"{len(broken):,} ảnh từ đúng thành sai (chấm nghiêm ngặt). "
         "Phần tự thích nghi không dùng nhãn; nhãn chỉ dùng để chấm điểm. "
         "Một tập ngoài duy nhất, không phải đánh giá lâm sàng.")
     gr.Image(str(folder / "summary.png"), label="Tổng quan", show_label=False)
@@ -179,6 +190,62 @@ def _showcase_tab(gr, folder: Path):
                 for r in picks]
 
     more.click(on_more, None, gallery)
+
+
+def continual_figure(history: list[dict]):
+    """Accuracy on held-out patients per consolidation round (harmonised Kather scoring)."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    rounds = [h["round"] for h in history]
+    fig, ax = plt.subplots(figsize=(8, 4.2))
+    for key, label, colour, offset in (
+            ("B_static_acc_harmonised", "Không thích nghi lúc chạy (kiến thức đã lưu)", "#4c8bf5", -15),
+            ("B_tta_iid_acc_harmonised", "+ tự thích nghi, ảnh xáo trộn", "#e8590c", 8),
+            ("B_tta_class_acc_harmonised", "+ tự thích nghi, ảnh theo ca", "#2f9e44", None)):
+        values = [100 * h[key] for h in history]
+        ax.plot(rounds, values, marker="o", lw=2.5 if offset == -15 else 1.5, color=colour, label=label)
+        for r, v in zip(rounds, values if offset is not None else []):
+            ax.annotate(f"{v:.1f}", (r, v), textcoords="offset points", xytext=(0, offset), ha="center",
+                        fontsize=10 if offset == -15 else 8, color=colour,
+                        fontweight="bold" if offset == -15 else "normal")
+    ax.set_xticks(rounds, ["Ban đầu"] + [f"Vòng {r}" for r in rounds[1:]])
+    ax.set_ylabel("Độ chính xác trên bệnh nhân chưa từng thấy (%)")
+    ax.set_ylim(min(70, ax.get_ylim()[0]), 100)
+    ax.grid(axis="y", alpha=0.3)
+    ax.legend(fontsize=8, loc="lower right")
+    ax.spines[["top", "right"]].set_visible(False)
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def _continual_tab(gr, history_path: Path):
+    """Consolidation rounds written by scripts/continual_resnet.py."""
+    import json
+
+    import pandas as pd
+
+    history = json.loads(history_path.read_text(encoding="utf-8"))
+    start, end = history[0], history[-1]
+    gr.Markdown(
+        "## Mô hình tự học thêm từ ảnh không nhãn của phòng lab mới\n"
+        "Kather 2016 được chia theo **bệnh nhân**. Mỗi vòng, mô hình xem ảnh *không nhãn* của nhóm A "
+        "(bệnh nhân 01, 03, 05, 06, 07, 09), tự gán nhãn giả cho ảnh nó chắc chắn, rồi fine-tune cùng ảnh cũ (replay) "
+        "và chưng cất từ phiên bản trước để không quên. Phiên bản mới chỉ được giữ nếu không kém hơn trên tập "
+        "kiểm định gốc. Độ chính xác đo trên nhóm B (bệnh nhân 02, 04, 08, 10), **không bao giờ dùng để học**.\n\n"
+        f"# {100 * start['B_static_acc_harmonised']:.1f}% → **{100 * end['B_static_acc_harmonised']:.1f}%**\n"
+        "Độ chính xác khi chạy *không thích nghi* (chấm theo định nghĩa lớp của Kather 2016): kiến thức mới được lưu "
+        "vào chính mô hình. Nhãn thật chỉ dùng để chấm điểm.")
+    gr.Plot(continual_figure(history), show_label=False)
+    rows = [{"Vòng": h["round"], "Ảnh đủ chắc chắn (dùng tối đa 771)": h.get("pseudo_labels", 0),
+             "Trong đó đoán đúng (%)": None if h.get("pseudo_label_accuracy") is None else round(100 * h["pseudo_label_accuracy"], 1),
+             "Không thích nghi (%)": round(100 * h["B_static_acc_harmonised"], 1),
+             "Không thích nghi, chấm nghiêm ngặt (%)": round(100 * h["B_static_acc"], 1),
+             "Tự thích nghi, xáo trộn (%)": round(100 * h["B_tta_iid_acc_harmonised"], 1),
+             "Tự thích nghi, theo ca (%)": round(100 * h["B_tta_class_acc_harmonised"], 1)} for h in history]
+    gr.Dataframe(pd.DataFrame(rows), interactive=False, label="Theo từng vòng (nhóm B)")
 
 
 def _pair_tab(gr, backend: DemoBackend, data_root: Path):
@@ -365,12 +432,12 @@ def main(argv=None) -> None:
     parser.add_argument("--port", type=int, default=7860)
     parser.add_argument("--data-root", type=Path, default=Path("C:/Code/DataSet/histopathology"),
                         help="Folder with kather2016/ and crc_val_he_7k/ for the live test tab")
-    parser.add_argument("--results-dir", type=Path, default=ROOT / "runs/overnight",
+    parser.add_argument("--results-dir", type=Path, default=ROOT / "runs/final",
                         help="Folder with vN.json from scripts/evaluate_histopathology_external.py")
     args = parser.parse_args(argv)
     # Bound to localhost: uploaded medical images must not be exposed on the network.
     allowed = [str(args.data_root)] if args.data_root.is_dir() else []
-    allowed.append(str(args.results_dir.parent / "showcase"))
+    allowed.append(str(args.results_dir.parent / "showcase"))  # summary/example figures
     build_ui(DemoBackend(args.registry_root, args.experience_root), args.data_root, args.results_dir).launch(
         server_name="127.0.0.1", server_port=args.port, allowed_paths=allowed)
 
