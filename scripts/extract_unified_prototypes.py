@@ -5,9 +5,7 @@ Does not overwrite any checkpoint. Outputs a separate torch file.
 """
 from __future__ import annotations
 import argparse
-import hashlib
 import json
-import random
 from pathlib import Path
 
 import torch

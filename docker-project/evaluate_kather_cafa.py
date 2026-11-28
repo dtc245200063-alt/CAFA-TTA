@@ -7,7 +7,7 @@ import numpy as np
 import torch
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader
-from torchvision import models, transforms
+from torchvision import models
 from torchvision.transforms import functional as TF
 from sklearn.metrics import accuracy_score, f1_score
 

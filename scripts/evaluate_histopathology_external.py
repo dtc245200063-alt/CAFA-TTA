@@ -11,7 +11,7 @@ Writes one JSON with:
 Research use only. Kather 2016 is one external set; seeds are paired, not independent runs.
 
 Example:
-    python scripts/evaluate_histopathology_external.py --version v2 --data-root C:/Code/DataSet/histopathology --out runs/overnight/v2.json
+    python scripts/evaluate_histopathology_external.py --version v2 --data-root C:/Code/DataSet/histopathology --out runs/final/v2.json
 """
 from __future__ import annotations
 

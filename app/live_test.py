@@ -3,7 +3,7 @@
 `run_comparison` streams a labelled subset of an external dataset through several
 methods in the same online batch-prequential protocol as
 `scripts/evaluate_histopathology_external.py`. Labels are used only for scoring.
-`results_frame` reads the frozen JSON outputs of that evaluator (runs/overnight/vN.json).
+`results_frame` reads the frozen JSON outputs of that evaluator (runs/final/vN.json).
 """
 from __future__ import annotations
 

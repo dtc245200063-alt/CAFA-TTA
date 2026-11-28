@@ -23,7 +23,6 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
-import sys
 import time
 import urllib.error
 import urllib.request

@@ -361,17 +361,3 @@ class ContinualSession:
             }
             for i in range(len(images))
         ]
-
-    def save_state(self, path: Path | str) -> None:
-        torch.save({"model": self.adapter.model.state_dict(),
-                    "reference": self.reference.state_dict(),
-                    "optimizer": self.adapter.optimizer.state_dict(),
-                    "updates": self.updates}, path)
-
-    def load_state(self, path: Path | str) -> None:
-        state = torch.load(path, map_location=self.device, weights_only=True)
-        self.adapter.model.load_state_dict(state["model"])
-        if "reference" in state:
-            self.reference.load_state_dict(state["reference"])
-        self.adapter.optimizer.load_state_dict(state["optimizer"])
-        self.updates = int(state["updates"])

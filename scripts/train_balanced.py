@@ -122,8 +122,6 @@ def main() -> None:
             total += len(labels)
         return correct / max(total, 1)
 
-    output_dir = ROOT / "experiments/balanced_training"
-    output_dir.mkdir(parents=True, exist_ok=True)
     output_checkpoint = args.output_checkpoint or default_checkpoint_path(ROOT, "balanced", cfg, is_legacy)
     output_checkpoint.parent.mkdir(parents=True, exist_ok=True)
 
@@ -205,7 +203,12 @@ def main() -> None:
 
         scheduler.step()
 
-    with open(output_dir / "history.json", "w", encoding="utf-8") as f:
+    history_path = ROOT / "experiments/balanced_training/history.json"
+    if not (is_legacy and args.output_checkpoint is None):
+        # Only the legacy reproduction run may write the frozen experiments/ history.
+        history_path = output_checkpoint.with_name(output_checkpoint.stem + "_history.json")
+    history_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(history_path, "w", encoding="utf-8") as f:
         json.dump(history, f, indent=2)
 
 

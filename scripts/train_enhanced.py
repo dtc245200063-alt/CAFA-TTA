@@ -104,8 +104,6 @@ def main() -> None:
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs)
     scaler = torch.amp.GradScaler("cuda", enabled=use_amp)
 
-    output_dir = ROOT / "experiments/enhanced_training"
-    output_dir.mkdir(parents=True, exist_ok=True)
     checkpoint_path = args.output_checkpoint or default_checkpoint_path(ROOT, "enhanced", cfg, is_legacy)
     checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -198,7 +196,12 @@ def main() -> None:
 
         scheduler.step()
 
-    with open(output_dir / "history.json", "w", encoding="utf-8") as f:
+    history_path = ROOT / "experiments/enhanced_training/history.json"
+    if not (is_legacy and args.output_checkpoint is None):
+        # Only the legacy reproduction run may write the frozen experiments/ history.
+        history_path = checkpoint_path.with_name(checkpoint_path.stem + "_history.json")
+    history_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(history_path, "w", encoding="utf-8") as f:
         json.dump(history, f, indent=2)
 
 
