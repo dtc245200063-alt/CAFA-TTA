@@ -1,0 +1,4 @@
+# Optional: Gradio continual-learning demo (app/demo_gradio.py)
+#   python -m pip install -r requirements-demo.txt
+-r requirements.txt
+gradio==6.32.0

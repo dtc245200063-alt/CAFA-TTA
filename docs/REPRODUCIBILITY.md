@@ -399,7 +399,7 @@ A project-level CUDA test is also available:
 
 ```powershell
 
-python test_cuda.py
+python scripts/check_cuda.py
 
 ```
 

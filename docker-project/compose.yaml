@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile
     image: cafa-tta-trainer:local
     gpus: all
+    shm_size: 2g
     working_dir: /runner
     volumes:
       - type: bind
@@ -12,9 +13,14 @@ services:
         target: /project
         read_only: true
       - type: bind
+        source: ${CAFA_DATA_PATH:-../data}
+        target: /datasets
+        read_only: true
+      - type: bind
         source: ./docker_runs
         target: /outputs
     environment:
       - PYTHONUNBUFFERED=1
+      - TORCH_HOME=/outputs/.torch_cache
     # No background service, restart policy, or automatic training.
     restart: "no"

@@ -26,7 +26,7 @@ and does not claim ownership of the original medical images.
 
 
 
-Last reviewed: 2026-11-19.
+Last reviewed: 2026-11-27 (Section 11 added; Sections 1-10 unchanged since 2026-11-19).
 
 
 
@@ -928,3 +928,139 @@ not as legal advice or a certification of redistribution rights.
 Users should consult the original dataset licenses
 
 and any applicable additional terms before reuse.
+
+
+
+---
+
+
+
+## 11. Multi-Modality Preparation Datasets
+
+
+
+`scripts/prepare_medical_datasets.py` prepares additional datasets for the
+multi-modality continual-learning extension. These datasets are not used
+by the frozen results in `experiments/` and are not redistributed here.
+
+Output layout: `<root>/<modality>/<name>/<class>/*`, with
+`train/`, `val/`, `test/` split folders where the source provides splits.
+The default root is `CAFA_DATASET_ROOT` or `C:\Code\DataSet`.
+
+
+
+### 11.1 Dataset Table
+
+
+
+"Auto-download" means the script fetches the files itself.
+"Verified" licenses were checked on 2026-11-27 against the source named
+in the license column. Entries marked "not re-verified" were not checked in
+that review and should be confirmed at the source before reuse.
+
+| Dataset | Modality | Resolution | License | Access method | Auto-download |
+|---|---|---|---|---|---|
+| Kather 2016 (`kather2016`) | histopathology | 150 x 150 px | CC BY 4.0 declared on Zenodo record 53169 (not re-verified) | Zenodo | yes |
+| NCT-CRC-HE-100K (`nct_crc_100k`) | histopathology | 224 x 224 px, 0.5 µm/px | CC BY 4.0 (verified, Zenodo record 1214456) | Zenodo | yes |
+| CRC-VAL-HE-7K (`crc_val_he_7k`) | histopathology | 224 x 224 px, 0.5 µm/px | CC BY 4.0 (verified, Zenodo record 1214456) | Zenodo | yes |
+| HAM10000 (`ham10000`) | dermatology | 600 x 450 px | CC BY-NC 4.0 declared by the original release (not re-verified) | Kaggle CLI with the user's own token | yes, via Kaggle token |
+| Chest X-Ray Pneumonia (`chest_xray_pneumonia`) | chest_xray | variable | Declared on the Kaggle and Mendeley pages (not re-verified) | Kaggle CLI with the user's own token | yes, via Kaggle token |
+| APTOS 2019 (`aptos2019`) | fundus | variable | Kaggle competition rules (not re-verified) | Kaggle CLI; the user must accept the competition rules on Kaggle first | yes, via Kaggle token |
+| DermaMNIST+ (`dermamnist_224`) | dermatology | 224 x 224 px | CC BY-NC 4.0 (verified, `medmnist.INFO` 3.0.2 and medmnist.com) | `medmnist` package | yes |
+| PneumoniaMNIST+ (`pneumoniamnist_224`) | chest_xray | 224 x 224 px | CC BY 4.0 (verified, same sources) | `medmnist` package | yes |
+| RetinaMNIST+ (`retinamnist_224`) | fundus | 224 x 224 px | CC BY 4.0 (verified, same sources) | `medmnist` package | yes |
+| BloodMNIST+ (`bloodmnist_224`) | hematology | 224 x 224 px | CC BY 4.0 (verified, same sources) | `medmnist` package | yes |
+| BreastMNIST+ (`breastmnist_224`) | breast_ultrasound | 224 x 224 px | CC BY 4.0 (verified, same sources) | `medmnist` package | yes |
+| PathMNIST+ (`pathmnist_224`) | histopathology | 224 x 224 px | CC BY 4.0 (verified, same sources) | `medmnist` package | yes |
+| ChestMNIST+ | chest_xray | 224 x 224 px | CC BY 4.0 (verified, same sources) | Not exported (multi-label) | no |
+| MHIST | histopathology | 224 x 224 px | Dataset Research Use Agreement (not re-verified) | Manual request form | no |
+| Chaoyang | histopathology | 512 x 512 px | Non-commercial, no redistribution (not re-verified) | Manual request form | no |
+| ISIC Archive / challenges | dermatology | variable | Per-image or per-challenge licenses (not re-verified) | Manual download from the ISIC Archive | no |
+| CheXpert | chest_xray | variable | Stanford Research Use Agreement (not re-verified) | Manual registration with Stanford AIMI | no |
+| MIMIC-CXR | chest_xray | variable | PhysioNet Credentialed Health Data License (not re-verified) | PhysioNet credentialed access | no |
+
+The medmnist.com license statement says MedMNIST is CC BY 4.0 except
+DermaMNIST, which is CC BY-NC 4.0. DermaMNIST is therefore limited to
+non-commercial use. The MedMNIST software is licensed separately (Apache-2.0).
+For entries marked "not re-verified", the listed resolution was not re-checked either.
+
+
+
+### 11.2 Notes on Specific Datasets
+
+
+
+**CRC-VAL-HE-7K.** The Zenodo record describes 7,180 patches from 50 patients,
+with no patient overlap with NCT-CRC-HE-100K, at 224 x 224 px and 0.5 µm/px.
+The Zenodo page states Macenko normalization only for NCT-CRC-HE-100K and
+does not state it for CRC-VAL-HE-7K. A Hugging Face mirror describes
+CRC-VAL-HE-7K as not Macenko-normalized. This was not confirmed against the
+original publication, so the normalization status should be treated as uncertain.
+CRC-VAL-HE-7K is also the source of the PathMNIST test split, so it is not
+an independent external set with respect to PathMNIST-trained models.
+
+**MedMNIST+ export.** Images are exported as PNG with the official
+train/val/test splits. Class folders are named `<label id>_<label name>`
+from `medmnist.INFO`, so ImageFolder class order matches the MedMNIST label ids.
+RetinaMNIST labels are ordinal grades (0-4) exported as classes.
+MedMNIST+ images are resized by the MedMNIST authors; they are not the
+original-resolution source images.
+
+**ChestMNIST.** ChestMNIST is multi-label (14 findings per image, any number
+may be positive). A single-class ImageFolder layout cannot represent it
+without discarding or duplicating labels, so the script does not export it.
+
+**Overlap between sources.** Some prepared datasets share origins.
+PathMNIST is derived from NCT-CRC-HE-100K and CRC-VAL-HE-7K, and Kather 2016
+comes from the same research group as NCT-CRC-HE-100K. Overlap between them
+has not been measured. Run `--check-duplicates` before combining datasets.
+
+
+
+### 11.3 Duplicate and Leakage Check
+
+
+
+```powershell
+python scripts/prepare_medical_datasets.py --check-duplicates
+```
+
+The check hashes every image under the root, except `_downloads/`:
+
+- Exact duplicates: SHA-256 of the decoded RGB pixels.
+- Near duplicates: 64-bit average hash (8 x 8 grayscale), grouped when the
+  Hamming distance is at most `--hamming-threshold` (default 5).
+
+The CSV (`<root>/duplicates.csv` by default) lists each group with the
+`modality/dataset` of every member, so cross-dataset groups are visible.
+Average hash is a coarse heuristic. Near-duplicate groups can contain false
+positives (for example, uniform background tiles) and can miss cropped or
+recolored copies. Groups should be inspected before any image is removed.
+
+
+
+### 11.4 Gated Datasets: Manual Access Only
+
+
+
+The script does not download these datasets, does not accept agreements,
+and does not store credentials. Each user must request access personally
+and accept the provider's terms. After download, place the images in the
+ImageFolder layout under `<root>/<modality>/<name>/<class>/`.
+
+- **MHIST** (https://bmirds.github.io/MHIST/): submit the request form and
+  accept the Dataset Research Use Agreement. The emailed download links are
+  reported to expire after 4 hours.
+- **Chaoyang** (https://bupt-ai-cz.github.io/HSA-NRL/): submit the request form.
+  The declared terms are non-commercial use and no redistribution.
+- **ISIC** (https://www.isic-archive.com/): download from the ISIC Archive or
+  challenge pages. Licenses differ per image and per challenge; check the
+  license field of each image or challenge release.
+- **CheXpert** (https://stanfordmlgroup.github.io/competitions/chexpert/):
+  register with Stanford AIMI and accept the Research Use Agreement.
+- **MIMIC-CXR** (https://physionet.org/content/mimic-cxr/): requires a
+  credentialed PhysioNet account, completed human-subjects training, and a
+  signed data use agreement.
+
+Access terms for these datasets were not re-verified in the 2026-11-27 review.
+Users should read the current terms at each provider before requesting access.

@@ -613,7 +613,7 @@ python -m pip install -r requirements.txt
 
 ```bash
 python -m pip check
-python test_cuda.py
+python scripts/check_cuda.py
 ```
 
 Installation in a fresh environment has not yet been independently verified.
@@ -699,6 +699,38 @@ The commands above document the intended execution workflow rather than a certif
 
 ---
 
+## Continual Learning Extension (Experimental)
+
+An experimental extension, separate from the frozen research pipeline, explores continual learning across modalities (histopathology, dermatology, chest X-ray, fundus, hematology, breast ultrasound) at 224x224. It never writes `checkpoints/` or `experiments/`.
+
+- Online: during a session, BatchNorm running statistics follow the incoming images by EMA from a class-balanced memory (latest images per predicted class, RoTTA-style), and CAFA-TTA v3 adapts BatchNorm affine parameters on buffered batches of images that pass the OOD gate.
+- Safety: images flagged out-of-distribution (energy score and prototype similarity) are never learned from by gradient, and the session resets to the source model when its predictions drift.
+- Persistent: user-confirmed labels and capped, confident pseudo-labels are consolidated offline with source-data replay and distillation. A new model version is promoted only if it does not regress on a fixed validation split, and earlier versions can be restored.
+
+```bash
+python scripts/train_modality.py --modality histopathology --data-dir <ImageFolder> --augment strong
+python -m pip install -r requirements-demo.txt
+python app/demo_gradio.py --data-root <folder with kather2016/ and crc_val_he_7k/>
+python scripts/consolidate.py --modality histopathology --source-data-dir <ImageFolder>
+```
+
+Evaluation scripts (outputs go to `runs/`, which is gitignored):
+
+| Script | What it measures |
+| --- | --- |
+| `scripts/evaluate_histopathology_external.py` | CRC-VAL-HE-7K (clean and colour-shifted), Kather 2016 static and online streams (shuffled and class-ordered, 3 seeds), synthetic non-tissue rejection |
+| `scripts/build_showcase.py` | Image-by-image before/after on Kather 2016 (first model vs current model with adaptation) |
+| `scripts/continual_resnet.py` | Consolidation rounds from unlabelled Kather 2016 patients 01, 03, 05, 06, 07, 09; scored on patients 02, 04, 08, 10, which are never used for learning |
+| `scripts/extract_foundation_features.py`, `scripts/evaluate_foundation.py`, `scripts/continual_foundation.py` | Comparison with a frozen pathology foundation model (Phikon, ViT-B/16) plus a linear head, feature-level TTA (class-balanced statistics, T3A) and the same consolidation protocol |
+
+Kather 2016 is scored two ways. Strict scoring counts the NCT classes MUC (mucus) and MUS (smooth muscle) as errors, because Kather 2016 has no such classes. Harmonised scoring follows the Kather 2016 class definitions (Sci Rep 6:27988), where "debris" includes necrosis, haemorrhage and mucus and "simple stroma" includes smooth muscle, so MUC counts as DEB and MUS as STR. Both are reported. Kather 2016 is one external dataset; seeds are paired, not independent runs; the class-ordered stream is simulated by sorting labels, not real cases; nothing here is clinically validated.
+
+The demo (`app/demo_gradio.py`, bound to 127.0.0.1) has tabs for the before/after showcase, the consolidation rounds, single-image analysis, a side-by-side two-image comparison, a labelled live test of source / BN-adapt / CAFA v3 / the session, and the saved results (`--results-dir`, default `runs/final`).
+
+The Phikon weights (owkin/phikon, Owkin non-commercial licence, research use only) are downloaded separately into `data/foundation/phikon/` and are never committed.
+
+---
+
 ## Repository Structure
 
 ```text
@@ -707,7 +739,14 @@ CAFA-TTA/
 |-- core/
 |   |-- cafa_adapter.py
 |   |-- cafa_agreement_adapter.py
-|   `-- cafa_soft_adapter.py
+|   |-- cafa_soft_adapter.py
+|   |-- training_utils.py
+|   |-- trainer.py            # Continual line: training loop, calibration
+|   |-- continual.py          # Online session, OOD gate, experience store
+|   `-- registry.py           # Model versions, promotion gate, rollback
+|
+|-- app/
+|   `-- demo_gradio.py        # Continual-learning demo (local only)
 |
 |-- kernel/
 |   |-- confidence.py
@@ -722,7 +761,9 @@ CAFA-TTA/
 |   |-- Prototype extraction
 |   |-- Adaptation evaluation
 |   |-- Statistical analysis
-|   `-- Research figure generation
+|   |-- Research figure generation
+|   |-- check_cuda.py         # Environment check
+|   `-- legacy/               # Superseded v1/v2, BN-only and TENT scripts
 |
 |-- experiments/
 |   |-- reproducibility/
@@ -745,7 +786,7 @@ CAFA-TTA/
 |-- data/                  # Local dataset storage
 |-- checkpoints/           # Local model artifacts
 |-- requirements.txt
-|-- test_cuda.py
+|-- requirements-dev.txt
 |-- .gitignore
 `-- README.md
 ```
