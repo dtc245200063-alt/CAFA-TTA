@@ -102,7 +102,8 @@ def build_ui(backend: DemoBackend, data_root: Path | None = None, results_dir: P
 
     modalities = backend.modalities()
     with gr.Blocks(title="CAFA-TTA continual demo") as demo:
-        gr.Markdown("# CAFA-TTA | Continual learning demo")
+        gr.Markdown("# CAFA-TTA: Căn chỉnh đặc trưng có xét đến độ tin cậy trong quá trình thích nghi tại thời điểm kiểm thử\n\n"
+                    "Confidence-Aware Feature Alignment for Test-Time Adaptation · demo học liên tục")
         gr.Markdown(DISCLAIMER)
         if not modalities:
             gr.Markdown("No model in the registry yet. Train one first, for example:\n\n"
